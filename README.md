@@ -4,7 +4,7 @@ A professional portfolio and technical demonstration platform showcasing capabil
 
 Built using **Flask** as the web framework and **Plotly Dash** for interactive analytics, with **Redis** and **Celery** managing background tasks and caching.
 
-## 🚀 Features
+## Features
 
 *   **Interactive Portfolio:** A data-driven resume and portfolio section parsed dynamically from JSON.
 *   **BI Dashboard Demo:** A fully interactive executive dashboard demonstrating advanced filtering, cross-filtering, and dynamic aggregation using Pandas and Plotly.
@@ -17,7 +17,7 @@ Built using **Flask** as the web framework and **Plotly Dash** for interactive a
     *   **Async Processing:** Celery workers handle long-running AI inference tasks to keep the UI responsive.
     *   **Security:** Google OAuth 2.0 authentication with role-based access control (RBAC).
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Core:** Python 3.13, Flask, Plotly Dash
 *   **Data & Async:** Pandas, Redis, Celery
@@ -25,7 +25,7 @@ Built using **Flask** as the web framework and **Plotly Dash** for interactive a
 *   **Infrastructure:** Docker, Terraform, Google Cloud Run
 *   **Package Management:** uv
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 base-insights-app/
@@ -83,7 +83,7 @@ celery --workdir app -A app:celery_app worker --loglevel=INFO --concurrency=2 -Q
 
 The app will be available at `http://localhost:1701/`.
 
-## 🚢 Deployment
+## Deployment
 
 Deployment is managed via **Terraform** and **Docker**.
 
@@ -121,7 +121,7 @@ DNS is managed by Cloudflare. Ensure you have the following variables in your `t
 *   `cloudflare_api_token`: API Token with `Zone.DNS` permissions.
 *   `cloudflare_zone_id`: The Zone ID for your domain found in the Cloudflare dashboard.
 
-## 🔐 Authentication & Access
+## Authentication & Access
 
 *   **Google Auth:** Managed in `app/auth.py`.
 *   **Access Control:**
