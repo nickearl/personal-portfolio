@@ -1,69 +1,67 @@
-name: Build and Deploy
+name: Deploy to Production
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   workflow_dispatch:
 
 env:
   PROJECT_ID: ${project_id}
   REGION: ${region}
-  REPO_NAME: ${repo_name}
-  IMAGE_NAME: ${image_name}
+  GAR_LOCATION: ${region}-docker.pkg.dev/${project_id}/${repo_name}
+  IMAGE: ${image_name}
   VM_NAME: ${vm_name}
-  VM_ZONE: ${vm_zone}
+  ZONE: ${vm_zone}
 
 jobs:
-  build-and-deploy:
+  deploy:
+    name: Build & Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
       id-token: 'write'
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # 1. Authenticate to Google Cloud
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v2'
-      with:
-        workload_identity_provider: $${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-        service_account: $${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: $${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: $${{ secrets.GCP_SERVICE_ACCOUNT }}
 
-    # 2. Configure Docker for Artifact Registry
-    - name: 'Configure Docker'
-      run: |
-        gcloud auth configure-docker $${{ env.REGION }}-docker.pkg.dev
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-    # 3. Build and Push Docker Image
-    - name: 'Build and Push Container'
-      run: |
-        IMAGE_TAG=$${{ env.REGION }}-docker.pkg.dev/$${{ env.PROJECT_ID }}/$${{ env.REPO_NAME }}/$${{ env.IMAGE_NAME }}:$${{ github.sha }}
-        docker build -t "$${IMAGE_TAG}" ./app
-        docker push "$${IMAGE_TAG}"
-        echo "IMAGE_TAG=$${IMAGE_TAG}" >> $GITHUB_ENV
+      - name: Docker Auth
+        run: |-
+          gcloud auth configure-docker ${region}-docker.pkg.dev --quiet
 
-    # 4. Deploy to VM via SSH
-    - name: 'Deploy to VM'
-      uses: 'google-github-actions/ssh-compute@v1'
-      with:
-        instance_name: $${{ env.VM_NAME }}
-        zone: $${{ env.VM_ZONE }}
-        ssh_private_key: $${{ secrets.GCP_SSH_PRIVATE_KEY }}
-        command: |
-          # Ensure the script exists or update it
-          cat << 'EOF' > update_app.sh
-          #!/bin/bash
-          set -e
-          IMAGE_URL=$1
-          docker pull "$IMAGE_URL"
-          if [ "$(docker ps -q -f name=${image_name})" ]; then
-              docker stop ${image_name} && docker rm ${image_name}
-          fi
-          docker run -d --name ${image_name} --restart always -p ${port}:${port} --env-file .env "$IMAGE_URL"
-          EOF
-          
-          chmod +x update_app.sh
-          ./update_app.sh $${{ env.IMAGE_TAG }}
+      - name: Build and Push Container
+        run: |-
+          docker build -t "$GAR_LOCATION/$IMAGE:$${{ github.sha }}" -t "$GAR_LOCATION/$IMAGE:latest" .
+          docker push "$GAR_LOCATION/$IMAGE:$${{ github.sha }}"
+          docker push "$GAR_LOCATION/$IMAGE:latest"
+
+      - name: Get VM IP
+        id: get-ip
+        run: |
+          IP=$(gcloud compute instances describe $VM_NAME --zone=$ZONE --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+          echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: $${{ steps.get-ip.outputs.vm_ip }}
+          username: ${ssh_user}
+          key: $${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          script: |
+            gcloud auth configure-docker ${region}-docker.pkg.dev --quiet
+            docker pull $GAR_LOCATION/$IMAGE:$${{ github.sha }}
+            docker stop $IMAGE || true
+            docker rm $IMAGE || true
+            docker run -d --name $IMAGE --restart always -p ${port}:1701 --env-file .env $GAR_LOCATION/$IMAGE:$${{ github.sha }}
+            docker image prune -a -f --filter "until=24h"

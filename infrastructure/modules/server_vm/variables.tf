@@ -89,3 +89,8 @@ variable "github_actions_public_key" {
   type        = string
   default     = ""
 }
+
+variable "gar_image_path" {
+  description = "Full path to the Docker image in Artifact Registry"
+  type        = string
+}

@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "FILL_ME_IN"
+    bucket  = "ne-tf"
     prefix  = "default/state"
   }
 }

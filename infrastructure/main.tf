@@ -12,6 +12,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -26,7 +30,7 @@ provider "cloudflare" {
 }
 
 data "google_secret_manager_secret_version" "github_token" {
-  secret  = "github-etl-pat"
+  secret  = "github-pat"
   version = "latest"
 }
 
@@ -37,7 +41,7 @@ provider "github" {
 
 # Enable required APIs
 resource "google_project_service" "services" {
-  for_each = toset(["iam.googleapis.com", "cloudresourcemanager.googleapis.com", "iamcredentials.googleapis.com", "artifactregistry.googleapis.com", "secretmanager.googleapis.com"])
+  for_each = toset(["iam.googleapis.com", "cloudresourcemanager.googleapis.com", "iamcredentials.googleapis.com", "artifactregistry.googleapis.com", "secretmanager.googleapis.com", "compute.googleapis.com"])
   project  = var.project_id
   service  = each.key
   disable_on_destroy = false
@@ -62,8 +66,9 @@ resource "local_file" "github_workflow" {
     vm_name     = var.server_name
     vm_zone     = var.zone
     port        = var.port
+    ssh_user    = var.ssh_user
   })
-  filename = "${path.module}/.github/workflows/deploy.yml"
+  filename = "${path.module}/../.github/workflows/deploy.yml"
 }
 
 # --- GitHub Actions Identity & Access ---
@@ -151,6 +156,17 @@ resource "github_actions_secret" "gcp_ssh_private_key" {
   plaintext_value = tls_private_key.github_deploy_key.private_key_openssh
 }
 
+# --- Application Secrets Generation ---
+
+resource "random_password" "flask_secret_key" {
+  length  = 32
+  special = false
+}
+
+resource "random_id" "flask_encryption_key" {
+  byte_length = 32
+}
+
 module "firewall" {
   source = "./modules/firewall"
   server_name = var.server_name
@@ -173,11 +189,20 @@ module "server_vm" {
   db_disk_size_gb       = var.db_disk_size_gb
   ssh_user              = var.ssh_user
   ssh_private_key_path  = var.ssh_private_key_path
-  flask_secret_key      = var.flask_secret_key
-  flask_encryption_key  = var.flask_encryption_key
+  flask_secret_key      = random_password.flask_secret_key.result
+  flask_encryption_key  = random_id.flask_encryption_key.b64_url
   authorized_domains    = var.authorized_domains
   region                = var.region
   github_actions_public_key = tls_private_key.github_deploy_key.public_key_openssh
+  gar_image_path        = "${var.region}-docker.pkg.dev/${var.project_id}/${var.artifact_registry_repo_name}/${var.image_name}:latest"
+}
+
+resource "cloudflare_record" "app_dns" {
+  zone_id = var.cloudflare_zone_id
+  name    = split(".", var.domain_name)[0]
+  value   = module.server_vm.static_ip
+  type    = "A"
+  proxied = true
 }
 
 output "reserved_static_ip" {

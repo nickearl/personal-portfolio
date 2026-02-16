@@ -1,6 +1,6 @@
 services:
   app:
-    image: ${SERVER_NAME}-app
+    image: ${IMAGE_PATH}
     container_name: ${SERVER_NAME}-app
     env_file:
       - .env
@@ -11,12 +11,14 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
+    secrets:
+      - github_token
     command: >
       gunicorn app:server -b 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 180
 
 
   worker:
-    image: ${SERVER_NAME}-app
+    image: ${IMAGE_PATH}
     container_name: ${SERVER_NAME}-worker
     command: >
       celery -A app:celery_app worker --loglevel=INFO --concurrency=2 -Q ${SERVER_NAME}
@@ -25,6 +27,8 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
+    secrets:
+      - github_token
     healthcheck:
       test: ["CMD-SHELL", "celery -A app:celery_app inspect ping --timeout=5 | grep -qi 'pong'"]
       interval: 20s
@@ -44,6 +48,24 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
-   
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+
 volumes:
   redis-data:
+
+secrets:
+  github_token:
+    environment: "GITHUB_TOKEN"
