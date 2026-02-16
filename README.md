@@ -1,30 +1,29 @@
-# BaseIQ Insights Dashboard
+# Personal Portfolio & AI Demo Platform
 
-BaseIQ is an executive dashboard and analytics platform built for Basemakers. It hosts various tools and scorecards to provide insights into territory performance, representative metrics, pricing, and prioritization.
+A professional portfolio and technical demonstration platform showcasing capabilities in Data Engineering, BI, and AI/LLM integration.
 
-The application is built using **Flask** as the web framework and **Plotly Dash** for interactive analytics, with **Redis** and **Celery** managing background tasks and caching.
+Built using **Flask** as the web framework and **Plotly Dash** for interactive analytics, with **Redis** and **Celery** managing background tasks and caching.
 
 ## 🚀 Features
 
-*   **Interactive Dashboards:**
-    *   **Territory Scorecard:** KPI overview by territory.
-    *   **Rep Scorecard:** Field representative performance metrics.
-    *   **Prioritization Tool:** Rank and visualize performance combinations.
-    *   **Pricing Tool:** Quantify expansion opportunities.
-*   **Authentication:** Google OAuth 2.0 integration via `flask-dance`.
-*   **Access Control:** Page-level user authorization.
-*   **Background Processing:** Asynchronous task execution using Celery and Redis.
-*   **Infrastructure:** Dockerized deployment managed by Terraform on GCP.
-*   **DNS Management:** Automated DNS records via Cloudflare.
+*   **Interactive Portfolio:** A data-driven resume and portfolio section parsed dynamically from JSON.
+*   **BI Dashboard Demo:** A fully interactive executive dashboard demonstrating advanced filtering, cross-filtering, and dynamic aggregation using Pandas and Plotly.
+*   **AI Design Lab:**
+    *   **Theme Generator:** Uses Gemini/LLMs to generate color palettes and CSS themes from natural language prompts.
+    *   **Asset Generator:** Creates consistent visual assets on the fly.
+*   **Sales Enablement Tool:** An AI-powered agent that generates tailored sales presentation outlines and slide content based on prospect data.
+*   **Enterprise-Grade Architecture:**
+    *   **Hybrid Flask/Dash:** Seamless integration of standard web routes with reactive Dash apps.
+    *   **Async Processing:** Celery workers handle long-running AI inference tasks to keep the UI responsive.
+    *   **Security:** Google OAuth 2.0 authentication with role-based access control (RBAC).
 
 ## 🛠️ Tech Stack
 
-*   **Backend:** Python 3.13, Flask
-*   **Frontend:** Plotly Dash, Dash Bootstrap Components
-*   **Data Processing:** Pandas, NumPy, DuckDB
-*   **Task Queue & Caching:** Celery, Redis
-*   **Infrastructure:** Docker, Terraform, Google Cloud Platform (GCP)
-*   **Package Manager:** `uv` (recommended) or `pip`
+*   **Core:** Python 3.13, Flask, Plotly Dash
+*   **Data & Async:** Pandas, Redis, Celery
+*   **AI/LLM:** OpenAI API, Google Gemini
+*   **Infrastructure:** Docker, Terraform, Google Cloud Run
+*   **Package Management:** uv
 
 ## 📂 Project Structure
 
@@ -34,19 +33,7 @@ base-insights-app/
 │   ├── app.py                  # Main Flask entry point
 │   ├── auth.py                 # Google OAuth & session logic
 │   ├── conf.py                 # Global UI configuration & page definitions
-│   ├── dash_app/
-│   │   ├── callbacks.py        # Centralized Dash callbacks
-│   │   ├── components.py       # Reusable UI components
-│   │   ├── pages/              # Individual dashboard pages (Rep, Territory, etc.)
-│   │   └── assets/             # Static assets (CSS, Images)
-│   ├── pyproject.toml          # Dependencies
-│   └── Dockerfile              # App container definition
-├── modules/                    # Terraform modules
-├── scripts/                    # Helper scripts & templates
-├── bootstrap.sh                # Deployment script
-├── main.tf                     # Main Terraform configuration
-└── variables.tf                # Terraform variables
-```
+
 
 ## ⚡ Local Development
 
@@ -73,8 +60,8 @@ DEPLOY_ENV=dev
 FLASK_SECRET_KEY=<your-secret-key>
 FLASK_ENCRYPTION_KEY=<fernet-key>
 REDIS_URL=redis://localhost:6379/0
-SERVER_NAME=Base-Insights
-DISPLAY_NAME=BaseIQ
+SERVER_NAME=Personal Portfolio
+DISPLAY_NAME=Personal Portfolio
 ENABLE_GOOGLE_AUTH=true # or false for local dev without auth
 GOOGLE_OAUTH_CLIENT_ID=<client-id>
 GOOGLE_OAUTH_CLIENT_SECRET=<client-secret>
@@ -140,9 +127,3 @@ DNS is managed by Cloudflare. Ensure you have the following variables in your `t
 *   **Access Control:**
     *   **Groups:** Permissions are defined in `app/conf.py` using `permission_groups` which map internal departments (from `internal_employees`) to roles (e.g., `EXECUTIVE`, `FIELD_LEADERSHIP`).
     *   **Page Access:** Each page in `conf.py` defines which `access_groups` are allowed to view it.
-    *   **Rep Scorecard:** Implements row-level security. Users see themselves and their direct reports. Users in specific high-level groups (e.g., `TECHNOLOGY`) can view all Field Sales reps.
-
-## 🧪 Testing
-
-*   **Linting:** `ruff check .` (if installed)
-*   **Type Checking:** `mypy .` (if configured)
