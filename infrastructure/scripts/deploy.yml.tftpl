@@ -1,0 +1,69 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${project_id}
+  REGION: ${region}
+  REPO_NAME: ${repo_name}
+  IMAGE_NAME: ${image_name}
+  VM_NAME: ${vm_name}
+  VM_ZONE: ${vm_zone}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 1. Authenticate to Google Cloud
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: $${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: $${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+    # 2. Configure Docker for Artifact Registry
+    - name: 'Configure Docker'
+      run: |
+        gcloud auth configure-docker $${{ env.REGION }}-docker.pkg.dev
+
+    # 3. Build and Push Docker Image
+    - name: 'Build and Push Container'
+      run: |
+        IMAGE_TAG=$${{ env.REGION }}-docker.pkg.dev/$${{ env.PROJECT_ID }}/$${{ env.REPO_NAME }}/$${{ env.IMAGE_NAME }}:$${{ github.sha }}
+        docker build -t "$${IMAGE_TAG}" ./app
+        docker push "$${IMAGE_TAG}"
+        echo "IMAGE_TAG=$${IMAGE_TAG}" >> $GITHUB_ENV
+
+    # 4. Deploy to VM via SSH
+    - name: 'Deploy to VM'
+      uses: 'google-github-actions/ssh-compute@v1'
+      with:
+        instance_name: $${{ env.VM_NAME }}
+        zone: $${{ env.VM_ZONE }}
+        ssh_private_key: $${{ secrets.GCP_SSH_PRIVATE_KEY }}
+        command: |
+          # Ensure the script exists or update it
+          cat << 'EOF' > update_app.sh
+          #!/bin/bash
+          set -e
+          IMAGE_URL=$1
+          docker pull "$IMAGE_URL"
+          if [ "$(docker ps -q -f name=${image_name})" ]; then
+              docker stop ${image_name} && docker rm ${image_name}
+          fi
+          docker run -d --name ${image_name} --restart always -p ${port}:${port} --env-file .env "$IMAGE_URL"
+          EOF
+          
+          chmod +x update_app.sh
+          ./update_app.sh $${{ env.IMAGE_TAG }}

@@ -1,0 +1,73 @@
+
+.logo-ring-spinner {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+}
+
+/* spinning ring */
+/* .logo-ring-spinner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  border-top-color: #2b2bcf;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+} */
+
+/* logo in the exact center */
+/* .logo-ring-spinner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%);
+  background: url('images/basemakers_logo.svg') center/contain no-repeat;
+} */
+
+.logo-ring-spinner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 4px solid rgba(43, 43, 207, 0.15);
+  border-top-color: #2b2bcf;
+  border-radius: 50%;
+  animation:
+    spin 1s linear infinite,
+    pulse 1.8s ease-in-out infinite;
+  box-shadow: 0 0 0 rgba(43, 43, 207, 0); /* base, animated in pulse */
+}
+
+.logo-ring-spinner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%);
+  background: url('images/basemakers_logo.svg') center/contain no-repeat;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(.95); }
+  40%, 60% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(43, 43, 207, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(43, 43, 207, 0.4);
+  }
+}

@@ -1,0 +1,458 @@
+{
+	"personal_info": {
+	  "name": "Nicholas Earl",
+	  "preferred_name": "Nick Earl",
+	  "location": "Los Angeles, CA",
+	  "email": "nickearl@gmail.com",
+	  "phone": "(862) 432-2954",
+	  "portfolio": "https://nickearl.net/portfolio",
+	  "linkedin": "https://www.linkedin.com/in/nickearl",
+	  "github": "https://github.com/nickearl"
+	},
+	"headline_summary": {
+	  "desired_titles": [
+		"Director / Senior Director / VP of Data & Analytics",
+		"Director / Senior Director / VP of Analytics Engineering",
+		"Director / Senior Director / VP of Data Strategy",
+		"Director / Senior Director / VP of Business Intelligence",
+		"Director / Senior Director / VP of AI/ML Engineering",
+		"Director / Senior Director / VP of AdTech/MarTech",
+		"Head of Data Strategy"
+	  ],
+	  "summary_statement": "Data leader with 15 years of experience in Business Intelligence, Analytics, AI/LLM, and modern data governance. Over 10 years in technical and managerial roles, pioneering ‘Undashboarding’—integrating real-time insights into workflows—and delivering measurable ROI via data mesh/lakehouse strategies, large-scale leadership, and advanced AI/ML initiatives (RAG, model fine-tuning)."
+	},
+	"languages": [
+	  {
+		"language": "English",
+		"proficiency": "Native"
+	  },
+	  {
+		"language": "Spanish",
+		"proficiency": "Conversational / Professional Working Proficiency"
+	  },
+	  {
+		"language": "Japanese",
+		"proficiency": "Basic"
+	  }
+	],
+	"skills": [
+	  {
+		"category": "Data, Business Intelligence & Analytics",
+		"keywords": [
+		  "Data Storytelling",
+		  "Dashboard Creation",
+		  "BI Infrastructure Development",
+		  "Data Modeling",
+		  "Star Schema",
+		  "Data Warehousing",
+		  "Data Lakehouse",
+		  "Data Mesh",
+		  "Content Analysis"
+		],
+		"bullet_points": [
+		  "Architected multi-terabyte data warehouses (AWS, GCP) to track user behavior, video events, marketing clicks, and product engagement.",
+		  "Integrated dashboards (Tableau, Power BI, Qlik Sense, Mode) and Python/SQL-based solutions, delivering real-time executive insights.",
+		  "Designed resilient data schemas for at-scale user tracking, ensuring consistent, high-volume ingestion of event data (video views, ad clicks, conversions).",
+		  "Implemented data mesh/lakehouse strategies to promote domain-based data ownership, self-service analytics, and cross-platform attribution modeling."
+		]
+	  },
+	  {
+		"category": "AI (ML/LLM) Enablement",
+		"keywords": [
+		  "RAG (Retrieval-Augmented Generation)",
+		  "Custom AI Agents",
+		  "Natural Language Processing",
+		  "Machine Learning",
+		  "LLM Fine-Tuning",
+		  "Spark",
+		  "Databricks",
+		  "AWS Sagemaker",
+		  "Langchain",
+		  "PyTorch",
+		  "OpenAI",
+		  "Gemini"
+		],
+		"bullet_points": [
+		  "Integrated LLM-based pipelines into Slack, Iterable, and Forsta Survey to transform AI insights into business strategy.",
+		  "Developed AI agents for sales planning, content moderation, and monetization; implemented RAG workflows and model fine-tuning.",
+		  "Experienced with Spark for distributed data processing, with readiness to leverage Databricks at scale.",
+		  "Familiar with AWS Sagemaker for ML model deployment and monitoring, supporting MLOps lifecycle management."
+		]
+	  },
+	  {
+		"category": "Hands-On Technical",
+		"keywords": [
+		  "Python (Flask, Dash, Celery, Redis)",
+		  "SQL",
+		  "AWS (S3, EC2)",
+		  "Google BigQuery",
+		  "Docker",
+		  "Plotly",
+		  "Kafka",
+		  "Kinesis",
+		  "AWS Glue"
+		],
+		"bullet_points": [
+		  "Expert-level Python and SQL, building proprietary ETL/orchestration frameworks inspired by Airflow/dbt DAGs.",
+		  "Advanced query optimization, complex joins, and data auditing to support high-performance solutions.",
+		  "Established code review, testing, version control processes for robust data pipelines at Fox and Fandom.",
+		  "Used Kafka, Kinesis, and AWS Glue for real-time ingestion and transformation of large-scale data sets."
+		]
+	  },
+	  {
+		"category": "Leadership & Mentorship",
+		"keywords": [
+		  "Team Leadership",
+		  "Project Delivery",
+		  "Cross-Functional Teams",
+		  "Agile Development",
+		  "Retention",
+		  "WSJF Prioritization",
+		  "Scrum/Kanban",
+		  "Budget & Funding Escalations"
+		],
+		"bullet_points": [
+		  "Led direct teams (5–12 data professionals) and coached cross-functional squads of 20+ to drive AI/analytics initiatives.",
+		  "Partnered with executives and PMO to prioritize backlogs using WSJF, securing funding and aligning projects with strategic goals.",
+		  "Achieved 0% voluntary turnover for three leadership roles, training junior talent into advanced data experts recognized by press outlets.",
+		  "Empowered teams to own deliverables end-to-end, adopting agile methods (standups, sprints, retrospectives) for consistent project success."
+		]
+	  },
+	  {
+		"category": "Data Strategy & Governance",
+		"keywords": [
+		  "Data Architecture",
+		  "ETL Processes",
+		  "Data Privacy (GDPR, CCPA, COPPA, VPPA)",
+		  "Analytics Implementation",
+		  "Data Governance Councils",
+		  "Data Stewardship",
+		  "Compliance Workflows",
+		  "SDLC / CI/CD for Data"
+		],
+		"bullet_points": [
+		  "Led data governance councils at Fox and Fandom, ensuring compliance with privacy laws and shaping corporate data policies.",
+		  "Oversaw data stewardship: naming conventions, metadata standards, curated datasets, and data integrity monitoring.",
+		  "Implemented CI/CD pipelines at Fandom for data solutions; introduced advanced privacy workflows (PII detection/exclusion) at Fox Corp.",
+		  "Presented compliance strategies to legal teams, integrating automated checks for PII across ingest pipelines and data stores."
+		]
+	  },
+	  {
+		"category": "Cloud & Infrastructure",
+		"keywords": [
+		  "AWS",
+		  "GCP",
+		  "Serverless Architecture",
+		  "Cost Optimization",
+		  "Big Data"
+		],
+		"bullet_points": [
+		  "Extensive production deployments on AWS & GCP, bridging data needs among engineering, product, and business teams.",
+		  "Integrated serverless pipelines (AWS Lambda, step functions) and BigQuery to handle multi-terabyte data workloads.",
+		  "Reduced tooling costs by leveraging Docker-based self-hosted solutions, replacing third-party analytics providers.",
+		  "Managed cloud data management for 5+ years, including multi-region setups and cross-account governance controls."
+		]
+	  }
+	],
+	"additional_skills": [
+	  "Tableau",
+	  "Power BI",
+	  "Qlik Sense",
+	  "Looker",
+	  "Mode",
+	  "Airflow",
+	  "dbt",
+	  "Amplitude",
+	  "Segment.io",
+	  "Adobe Analytics",
+	  "Freewheel",
+	  "DFP",
+	  "true[x]",
+	  "Docker",
+	  "Jinja",
+	  "RFP Management",
+	  "Data Privacy Laws",
+	  "GDPR",
+	  "CCPA",
+	  "COPPA",
+	  "VPPA",
+	  "Kafka",
+	  "Kinesis",
+	  "AWS Glue",
+	  "Spark",
+	  "Databricks",
+	  "AWS Sagemaker",
+	  "Agile/Scrum",
+	  "Budget/P&L Management"
+	],
+	"professional_experience": [
+	  {
+		"company": "Fandom",
+		"title": "Director, Business Intelligence & Site Analytics",
+		"location": "Los Angeles, CA",
+		"start_date": "06/21",
+		"end_date": "Present",
+		"bullet_points": [
+		  "Launched an LLM-based media plan creator that increased revenue per deal by 15%, planned for subscription monetization.",
+		  "Drove the ‘Undashboarding’ concept, integrating analytics with Slack, Iterable, Forsta Survey to automate AI-driven insights for marketing and research.",
+		  "Implemented CI/CD pipelines for real-time ingestion (AWS & GCP), enabling rapid iteration on analytics solutions.",
+		  "Defined scalable data schemas for user engagement, video metrics, and marketing attribution, reducing query times by 40%.",
+		  "Executed data mesh/lakehouse (S3 + BigQuery) to empower domain-based teams with near-real-time data ingestion via Kafka/Kinesis and AWS Glue.",
+		  "Partnered with data governance councils to ensure compliance with GDPR, CCPA, and other privacy regulations.",
+		  "Led multiple RFPs & evaluations for data tools from start to finish, including CDP (Segment, Amplitude), DMP (Adobe, Salesforce), and data visualization platforms (Tableau, Qlik). Identified feature needs and priorities across multiple teams to create objective scoring criteria."
+		]
+	  },
+	  {
+		"company": "FOX Corp",
+		"title": "Director, Data Strategy & Analytics Systems",
+		"location": "Los Angeles, CA",
+		"start_date": "03/19",
+		"end_date": "06/21",
+		"bullet_points": [
+		  "Analytics and data tech lead for FOX's $1B+ streaming video business, overseeing data strategy and governance.",
+		  "Owned project to rebuild FOX’s streaming data strategy after most of the company assets acquired by Disney, retiring numerous legacy SaaS tools like Adobe Analytics in favor of 1P cloud-based data warehouse & analytics solutions.",
+		  "Introduced advanced privacy workflows (GDPR, CCPA, COPPA) with automated PII detection/exclusion via tools like Segment.io and internal tools & processes.",
+		  "Integrated Nielsen TCR for unified video tracking, enabling cross-platform advertising strategies and consolidated measurement.",
+		  "Led the design of robust data models for user behavioral tracking, linking digital engagement with marketing and product attribution data.",
+		  "Orchestrated domain-based data stewardship, standardizing metadata and nomenclature across 50+ websites/apps."
+		]
+	  },
+	  {
+		"company": "Fox Networks Group / 21st Century Fox",
+		"title": "Director, Data Strategy & Analytics Systems",
+		"location": "Los Angeles, CA",
+		"start_date": "03/17",
+		"end_date": "03/19",
+		"bullet_points": [
+		  "Led Enterprise Data Transformation and Governance council across 21CF, driving GDPR/CCPA compliance and global data standardization.",
+		  "Collaborated with Disney, CBS, and legal teams to define cross-network data-sharing frameworks in entertainment, sports, and film.",
+		  "Presented privacy-compliant data roadmaps to C-suite, bridging technical constraints with legal and business needs."
+		]
+	  },
+	  {
+		"company": "Fox Networks Group / 21st Century Fox",
+		"title": "Sr Manager, Data Strategy & Analytics Systems",
+		"location": "Los Angeles, CA",
+		"start_date": "06/15",
+		"end_date": "03/17",
+		"bullet_points": [
+		  "Designed and implemented data architecture across multiple Fox brands (Adobe Analytics, DMPs, CDP, ad systems), uniting linear television and digital streaming insights.",
+		  "Deployed Adobe Heartbeat in 20+ apps, enhancing measurement accuracy for live/on-demand video metrics.",
+		  "Integrated ad delivery systems (Freewheel, true[x], DFP) to enable unified targeting, forecasting, and inventory planning."
+		]
+	  }
+	],
+	"education": [
+	  {
+		"institution": "New York University – Leonard N. Stern School of Business",
+		"location": "New York, NY",
+		"degree": "BS, Business Administration",
+		"majors": [
+		  "Marketing",
+		  "International Business"
+		],
+		"concentration": "Entertainment and Media Industries"
+	}
+	],
+	"awards_projects_presentations": [
+	  {
+		"title": "Adobe Summit | Salt Lake City, UT | 3/14",
+		"description": "Presenter, Mobile Analytics Best Practices"
+	  },
+	  {
+		"title": "ISDI Digital University | San Jose, CA | 4/18",
+		"description": "Guest Professor, Media Industry Metrics"
+	  },
+	  {
+		"title": "Eagle Scout",
+		"description": "Boy Scouts of America"
+	  },
+	  {
+		"title": "Shodon (Black Belt)",
+		"description": "Isshinryu Karate"
+	  }
+	],
+	"major_achievements": [
+	  {
+		"title": "AI-Driven Media Plan Creator",
+		"company": "Fandom",
+		"description": "Built an LLM-based tool analyzing movie plots to identify targetable ad segments and auto-generate sales collateral.  Under the hood its a Flask app running Dash using Plotly libraries and the OpenAI and Gemini APIs",
+		"impact_metrics": [
+		  "15% revenue lift per deal",
+		  "Automated contextual targeting campaign planning, execution, and post-campaign insights.",
+		  "Custom, python-based client-facing UX built on open-source tools (Flask/Dash/Plotly/Redis with OpenAI and Gemini APIs)",
+		  "Daily use by 50+ internal stakeholders",
+		  "So successful the company intends to make this a subscription-based revenue product we license out"
+		]
+	  },
+	  {
+		"title": "Undashboarding Philosophy",
+		"description": "Embedding analytics directly into daily workflows, reducing reliance on static dashboards and accelerating decision-making.",
+		"impact_metrics": [
+		  "~7 hours/month saved per analyst",
+		  "Broad adoption among marketing & research teams",
+		  "Agile response to business needs"
+		]
+	  },
+	  {
+		"title": "Team Mentorship & Retention",
+		"description": "Sustained 0% voluntary turnover across three leadership roles, developing junior staff into advanced data practitioners.",
+		"impact_metrics": [
+		  "Analyst work featured in AdWeek, Variety, LA Times",
+		  "Declined higher-paying offers to remain on team",
+		  "Increased internal efficiency and morale"
+		]
+	  },
+	  {
+		"title": "Data System Overhaul at Fox",
+		"company": "FOX Corp",
+		"description": "Phased out Adobe Analytics for a cost-effective in-house solution with modern data governance and architecture.",
+		"impact_metrics": [
+		  "30% reduction in licensing fees",
+		  "Streamlined cross-platform measurement",
+		  "Accelerated data-driven ad strategies"
+		]
+	  },
+	  {
+		"title": "Workflow Automation",
+		"company": "Fandom",
+		"description": "Used python, cloud data platforms, LLMs/ML, and open-source tools to automate manual processes company-wide, enhancing data accessibility and reducing time spent on repetitive tasks.",
+		"impact_metrics": [
+			"Hundreds of staff hours saved per month",
+			"Improved data accuracy and consistency",
+			"Shifted conversations away from being about getting and using the data itself to the insights and outcomes it drives.",
+			"Abstracted complex data back-ends into simple, task-oriented UX front-ends."
+		],
+		"examples": [
+			"Tool that automatically generates, deploys, and optimizes customer surveys.",
+			"Dynamic generation and retrieval of art assets for use in marketing and sales collatoral.",
+			"One-click tool to generate customized, branded sales collatoral (slide decks, graphics) for pitching advertiser clients.",
+			"SQL query generation tool that allows non-technical users to generate, run, and visualize complex queries without needing to know SQL."
+		]
+	  },
+	  {
+		"title": "Pressworthy Analytics",
+		"company": "Fandom",
+		"description": "Analyses performed by my teams have been featured in AdWeek, Variety, LA Times, and other major publications. I have also been quoted in articles and interviews discussing the impact of data on the media industry.",
+		"impact_metrics": [
+		  "Increased visibility and credibility for the analytics team",
+		  "Strengthened relationships with media outlets and industry stakeholders",
+		  "Enhanced Fandom's reputation as a thought leader in data-driven media"
+		],
+		"examples": [
+			{
+				"Variety": [
+				  {
+					"url": "https://variety.com/lists/video-game-tv-series-ideas-study/",
+					"text": "What Video Games Should Streamers Adapt?"
+				  },
+				  {
+					"url": "https://variety.com/2024/tv/news/warhammer-marvel-league-of-legends-fallout-top-franchises-2024-fandom-1236241558/",
+					"text": "‘Warhammer,’ Marvel, ‘League of Legends’ and ‘Fallout’ Among Top Entertainment Franchises of the Year, New Fandom Report Says"
+				  }
+				],
+				"Ad Week": [
+				  {
+					"url": "https://www.adweek.com/convergent-tv/streamer-releases-weekly-binge/",
+					"text": "Binge or Weekly? Here's the Best Way for Streamers to Release Shows"
+				  }
+				],
+				"LA Times": [
+				  {
+					"url": "https://www.latimes.com/entertainment-arts/tv/newsletter/2024-08-09/the-boys-bridgerton-house-of-the-dragon-the-bear-weekly-binge-screen-gab",
+					"text": "Weekly Episode Drops are Better Than Binge.  And There's Data to Back it Up."
+				  }
+				],
+				"TheWrap": [
+				  {
+					"url": "https://www.thewrap.com/fandom-avatar-top-gun-oscars-fan-vote/",
+					"text": "What if Fans Voted for the Oscars?"
+				  },
+				  {
+					"url": "https://www.thewrap.com/peacock-bundling-partner-fandom-data/",
+					"text": "Peacock Bundling Partner Fandom Data"
+				  }
+				]
+			  }	
+		]
+	  }
+	],
+	"additional_context": {
+	  "preferred_industries": [
+		"Media & Entertainment",
+		"Tech Startups",
+		"Mid-to-Large Enterprises"
+	  ],
+	  "personal_mission": "To drive practical data and AI solutions that unlock immediate business value through strategic governance, analytics engineering, and forward-thinking leadership.",
+	  "key_philosophies": {
+		"undashboarding": "Integrating data and insights directly into daily workflows for frictionless decisions.",
+		"hire_for_potential": "Prioritize mentorship and skill-building to reduce attrition and strengthen team capabilities."
+	  }
+	},
+	"hobbies": [
+	  {
+		"name": "Home Lab & Server Tinkering",
+		"description": "Operating a home lab with a 1990s-style server rack complete with blinking lights and bundled cables. Repurposes decommissioned enterprise server hardware from eBay to build systems that power smart home automation, media servers, self-hosted file sharing/backups, DNS, ad blocking, VPN, and password management.",
+		"activities": [
+		  "Building and maintaining a smart home automation system",
+		  "Running a home media server",
+		  "Setting up self-hosted file sharing and backup solutions",
+		  "Hosting a DNS server, ad blocking server, VPN, and password manager"
+		],
+		"technical_skills": [
+		  "Docker containers",
+		  "Virtualization",
+		  "Linux system administration",
+		  "Package management",
+		  "HTTP protocol",
+		  "BASH/shell scripting",
+		  "Python scripting",
+		  "jinja"
+		],
+		"frequency": "Daily tinkering with occasional family-induced frustrations",
+		"transferrable_skills": "Troubleshooting, system administration, automation, and scripting—skills directly applicable to professional work in data engineering and analytics.",
+		"personal_insight": "I find it incredibly satisfying when everything is working smoothly, even if it occasionally tests my family's patience.",
+		"image_path": "assets/images/server_rack.jpg"
+	  },
+	  {
+		"name": "Skiing",
+		"description": "I love hitting the slopes across the United States and Canada, enjoying the physical challenge of skiing down treacherous trails without falling. Although I've dabbled in snowboarding, skiing remains my primary passion.",
+		"activities": [
+		  "Skiing at various resorts across the US and Canada",
+		  "Navigating challenging and treacherous trails",
+		  "Occasionally trying snowboarding"
+		],
+		"frequency": "Once a year now, though more frequent before having kids",
+		"transferrable_skills": "Resilience, risk management, and determination—all qualities that enhance strategic problem-solving in professional settings.",
+		"personal_insight": "The thrill of overcoming a challenging slope is incredibly satisfying and mirrors the satisfaction I get from troubleshooting complex problems at work."
+	  },
+	  {
+		"name": "Video Games",
+		"description": "While I don't play as frequently as I used to, I enjoy strategic and simulation games like Factorio, Kerbal Space Program, and Dwarf Fortress. These games require designing and managing increasingly complex systems, much like architecting scalable data pipelines and DAGs.",
+		"activities": [
+		  "Designing modular factory systems",
+		  "Establishing and managing complex, scalable systems (e.g., lunar refuelling colonies)",
+		  "Strategic planning and problem solving in dynamic environments"
+		],
+		"frequency": "Occasionally during free time",
+		"transferrable_skills": "System architecture, modular design, strategic planning, and complex problem-solving—skills that translate well to building and managing BI pipelines.",
+		"personal_insight": "These games mirror the challenges in my professional work, blending creativity with engineering rigor to overcome obstacles and optimize systems."
+	  },
+	  {
+		"name": "Smart Home Automation",
+		"description": "I manage an extensive IoT network of devices across my house, centrally controlled by apps and scripts running on my server rack. This system automatically adjusts lighting based on time and weather, alerts me if doors are left open, and turns off the air conditioning when windows are open.",
+		"activities": [
+		  "Automated lighting adjustments",
+		  "Door status monitoring and alerts",
+		  "Sprinklers that adjust based the weather",
+		  "HVAC control based on environmental conditions",
+		  "Utilizing open-source and self-hosted hardware/software (e.g., Home Assistant)"
+		],
+		"frequency": "Weekly updates",
+		"transferrable_skills": "Jinja templating, XML, complex if/then logic similar to ETL orchestration, network requests, HTTP protocol, IoT integration, and data & network security—skills directly applicable to professional Python workflows.",
+		"personal_insight": "This hobby streamlines my daily routines while reinforcing technical skills that enhance my professional work in automation and data orchestration."
+	  }
+				  
+	]
+  }
+  

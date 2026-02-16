@@ -1,0 +1,98 @@
+#!/bin/bash
+set -euo pipefail
+echo "Provisioning ${server_name} server for ${domain_name}..."
+
+apt update && apt install -y ca-certificates curl gnupg lsb-release jq git unzip dnsutils
+# --- Docker official repo (don’t use docker.io from distro)
+install -m 0755 -d /etc/apt/keyrings
+if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
+  curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg \
+    | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  chmod a+r /etc/apt/keyrings/docker.gpg
+fi
+
+DOCKER_ARCH="$(dpkg --print-architecture)"
+DOCKER_CODENAME="$(. /etc/os-release; echo "$VERSION_CODENAME")"
+echo \
+  "deb [arch=$${DOCKER_ARCH} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+  $${DOCKER_CODENAME} stable" > /etc/apt/sources.list.d/docker.list
+
+apt-get update
+apt-get install -y \
+  docker-ce \
+  docker-ce-cli \
+  containerd.io \
+  docker-buildx-plugin \
+  docker-compose-plugin
+
+systemctl enable --now docker
+
+# Add the default user to the docker group so sudo isn’t required
+if id "${ssh_user}" &>/dev/null; then
+  usermod -aG docker "${ssh_user}"
+fi
+
+# --- Stop nginx if present (don’t fail if it isn’t)
+systemctl stop nginx 2>/dev/null || true
+systemctl disable nginx 2>/dev/null || true
+
+# Create all dirs
+mkdir -p "/opt/${server_name}"
+mkdir -p "/opt/${server_name}/app"
+
+# Unpack uploaded app bundle into build context
+unzip -o /tmp/app.zip -d "/opt/${server_name}/app" && rm /tmp/app.zip
+cd "/opt/${server_name}"
+
+# Fetch GitHub Token for private repo access
+echo "Fetching GitHub token..."
+if ! GITHUB_TOKEN=$(gcloud secrets versions access latest --secret="github-etl-pat" 2>/dev/null); then
+  echo "⚠️ Warning: Could not fetch 'github-etl-pat' from Secret Manager. Private repo clones may fail."
+  # Create a dummy token file to prevent docker build from crashing on missing secret
+  touch /tmp/github_token
+else
+  echo "$GITHUB_TOKEN" > /tmp/github_token
+  export GITHUB_TOKEN
+fi
+
+# Manually build images with secret injection
+echo "Building Docker images with secrets..."
+docker build -t "${server_name}-app" -f app/Dockerfile --secret id=github_token,src=/tmp/github_token app
+
+rm -f /tmp/github_token
+
+export PORT=${port}  
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
+# Write .env file
+cat > .env <<EOF
+${dotenv_file}
+EOF
+
+# Write docker-compose.yml
+cat > docker-compose.yml <<EOF
+${compose_file}
+EOF
+
+# Start docker stack (modern syntax)
+docker compose pull || true
+docker compose up -d
+
+# Install Google Cloud SDK if not already installed
+# --- Google Cloud SDK (modern keyring method)
+if ! command -v gsutil >/dev/null 2>&1; then
+  echo "Installing Google Cloud SDK..."
+  install -m 0755 -d /etc/apt/keyrings
+  if [ ! -f /etc/apt/keyrings/google-cloud.gpg ]; then
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+      | gpg --dearmor -o /etc/apt/keyrings/google-cloud.gpg
+    chmod a+r /etc/apt/keyrings/google-cloud.gpg
+  fi
+  echo "deb [signed-by=/etc/apt/keyrings/google-cloud.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+    > /etc/apt/sources.list.d/google-cloud-sdk.list
+  apt-get update
+  apt-get install -y google-cloud-cli
+fi
+
+echo "Provisioning complete."

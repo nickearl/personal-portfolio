@@ -1,0 +1,49 @@
+services:
+  app:
+    image: ${SERVER_NAME}-app
+    container_name: ${SERVER_NAME}-app
+    env_file:
+      - .env
+    environment:
+      PORT: "${PORT}"
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    command: >
+      gunicorn app:server -b 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 180
+
+
+  worker:
+    image: ${SERVER_NAME}-app
+    container_name: ${SERVER_NAME}-worker
+    command: >
+      celery -A app:celery_app worker --loglevel=INFO --concurrency=2 -Q ${SERVER_NAME}
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app:celery_app inspect ping --timeout=5 | grep -qi 'pong'"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 25s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server","--appendonly","yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+   
+volumes:
+  redis-data:

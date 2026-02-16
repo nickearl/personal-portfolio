@@ -1,0 +1,665 @@
+.global-container {
+    font-family:Ubuntu;
+}
+
+.directory-row {
+    /* height:400px; */
+    width:100%;
+    max-width:1000px;
+}
+.directory-image {
+    height: 200px;
+    width: 200px;
+    padding: 1rem;
+}
+.directory-link {
+    font-size:1.2rem;
+    font-weight:bold;
+    color:white;
+}
+.quote-card {
+    background-color:#3A434B;
+    color:#FFFFFF;
+    max-width:600px;
+}
+.quote-card-text {
+    font-size:1.5rem;
+    font-style: italic;
+    font-weight: bold;
+    width:75%;
+}
+.quote-card-quotee {
+    font-size:1rem;
+}
+.quote-card-image {
+    padding:.1rem;
+}
+.quote-card-source-media {
+    font-size: .75rem;
+    font-style: italic;
+}
+.ag-theme-quartz .ag-header {
+    font-family: sans-serif;
+}
+
+.ag-theme-quartz .ag-header-group-cell {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.ag-theme-quartz .ag-header-cell {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.crossover-main-vertical-tag {
+    font-weight: bold;
+    color: black;
+    font-size: 16px;
+    width: 200px;
+}
+
+.crossover-genres-tag {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display:block;
+    width: 200px;
+}
+
+.crossover-tag {
+    color: black;
+    font-size: 16px;
+    width: 200px;
+    text-align: left;
+}
+
+.list-group-item {
+    border: none;
+}
+
+.crossover-threshold-slider {
+    width: 100%;
+}
+
+.crossover-summary-tag {
+   padding: .375rem .75rem;
+   border-radius: 0.4rem
+}
+
+.crossover-summary-tag-theme-name {
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+}
+.crossover-summary-tag-rel-index {
+    font-size:.75rem;
+    text-align: center;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    font-weight: bold;
+    color: #520044;
+    background: radial-gradient(ellipse at center, rgb(255 197 0 / 100%) 0%, rgb(255 197 0 / 100%) 50%, rgb(255 197 0 / 0%) 50%)
+}
+
+.loading-modal {
+/*    position:fixed;*/
+    top:30%;
+/*    left:30%;*/
+    margin: 1rem auto;
+}
+
+.loading-card {
+    background-color: #838D86;
+}
+.loading-list {
+    background-color: #3A434B;
+    color:white;
+
+}
+
+/* Cell Bar Chart */
+.grid-cell-bar-chart {
+    color: white;
+    font-weight: bold;
+    padding-left:.25rem;
+}
+.grid-cell-bar-chart-primary {
+    font-size:1.2rem;
+    background: linear-gradient(90deg, #86D7DC 20%, transparent 100%, transparent 100%)
+}
+.grid-cell-bar-chart-100 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 100%, transparent 100%)
+}
+.grid-cell-bar-chart-95 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 95%, transparent 95%)
+}
+.grid-cell-bar-chart-90 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 90%, transparent 90%)
+}
+.grid-cell-bar-chart-85 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 85%, transparent 85%)
+}
+.grid-cell-bar-chart-80 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 80%, transparent 80%)
+}
+.grid-cell-bar-chart-75 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 75%, transparent 75%)
+}
+.grid-cell-bar-chart-70 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 70%, transparent 70%)
+}
+.grid-cell-bar-chart-65 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 65%, transparent 65%)
+}
+.grid-cell-bar-chart-60 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 60%, transparent 60%)
+}
+.grid-cell-bar-chart-55 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 55%, transparent 55%)
+}
+.grid-cell-bar-chart-50 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 50%, transparent 50%)
+}
+.grid-cell-bar-chart-45 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 45%, transparent 45%)
+}
+.grid-cell-bar-chart-40 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 40%, transparent 40%)
+}
+.grid-cell-bar-chart-35 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 35%, transparent 35%)
+}
+.grid-cell-bar-chart-30 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 30%, transparent 30%)
+}
+.grid-cell-bar-chart-25 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-20 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-15 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-10 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-5 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-0 {
+    background: linear-gradient(90deg, #FA005A 20%, transparent 25%, transparent 25%)
+}
+
+.grid-cell-bar-chart-secondary-100 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 100%, transparent 100%)
+}
+.grid-cell-bar-chart-secondary-95 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 95%, transparent 95%)
+}
+.grid-cell-bar-chart-secondary-90 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 90%, transparent 90%)
+}
+.grid-cell-bar-chart-secondary-85 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 85%, transparent 85%)
+}
+.grid-cell-bar-chart-secondary-80 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 80%, transparent 80%)
+}
+.grid-cell-bar-chart-secondary-75 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 75%, transparent 75%)
+}
+.grid-cell-bar-chart-secondary-70 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 70%, transparent 70%)
+}
+.grid-cell-bar-chart-secondary-65 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 65%, transparent 65%)
+}
+.grid-cell-bar-chart-secondary-60 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 60%, transparent 60%)
+}
+.grid-cell-bar-chart-secondary-55 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 55%, transparent 55%)
+}
+.grid-cell-bar-chart-secondary-50 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 50%, transparent 50%)
+}
+.grid-cell-bar-chart-secondary-45 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 45%, transparent 45%)
+}
+.grid-cell-bar-chart-secondary-40 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 40%, transparent 40%)
+}
+.grid-cell-bar-chart-secondary-35 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 35%, transparent 35%)
+}
+.grid-cell-bar-chart-secondary-30 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 30%, transparent 30%)
+}
+.grid-cell-bar-chart-secondary-25 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-secondary-20 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-secondary-15 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-secondary-10 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-secondary-5 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 25%, transparent 25%)
+}
+.grid-cell-bar-chart-secondary-0 {
+    background: linear-gradient(90deg, #FFC500 20%, transparent 25%, transparent 25%)
+}
+
+
+/* ---------------------------------------------------------        */
+/* Cell Highlight Config — (overridable per column or per cell)     */
+/* ---------------------------------------------------------        */
+:root {
+  --highlight-pos-rgb: 42 157 143;     /* positive color */
+  --highlight-neg-rgb: 231 111 180;     /* negative color */
+
+  --highlight-alpha-max: 0.80;
+  --highlight-alpha-min: 0.00;
+
+  --highlight-radius-min: 95%;
+  --highlight-radius-max: 95%;
+}
+
+/* --------------------------------------------------------- */
+/* UNIFIED HIGHLIGHT CLASS (works for -100..100)             */
+/* --------------------------------------------------------- */
+.grid-cell-highlight {
+  --p: 0;                                      /* user sets -100..100 */
+
+  /* per-cell override capability */
+  --pos-color: var(--highlight-pos-rgb);
+  --neg-color: var(--highlight-neg-rgb);
+
+  /* derive sign and intensity */
+  --pos: clamp(0, (var(--p) / 100), 1);        /* 0..1 when p > 0 */
+  --neg: clamp(0, (-1 * var(--p) / 100), 1);   /* 0..1 when p < 0 */
+  --t:   max(var(--pos), var(--neg));          /* |p| normalized */
+
+  /* alpha scales with |p| */
+  --alpha-pos: calc(var(--pos) * var(--highlight-alpha-max));
+  --alpha-neg: calc(var(--neg) * var(--highlight-alpha-max));
+
+  /* optional size modulation */
+  --radius: calc(
+    var(--highlight-radius-min) +
+    var(--t) * (var(--highlight-radius-max) - var(--highlight-radius-min))
+  );
+
+  /* TWO radial gradients: only one is visible based on sign */
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgb(var(--pos-color) / var(--alpha-pos)) 0 var(--radius),
+      rgb(var(--pos-color) / 0) var(--radius)
+    ),
+    radial-gradient(circle at 50% 50%,
+      rgb(var(--neg-color) / var(--alpha-neg)) 0 var(--radius),
+      rgb(var(--neg-color) / 0) var(--radius)
+    );
+
+  transition: background 150ms ease;
+}
+
+
+
+.home-panel {
+    max-width:1000px;
+    min-width:600px;
+/*    height:500px;*/
+    padding:1rem;
+}
+
+.home-panel-feature {
+    padding:1rem;
+}
+
+.home-panel-text {
+    color:black;
+    padding:3rem;
+    font-size:1.2rem;
+}
+
+.intro-text {
+    padding:3rem;
+}
+.intro-image {
+    max-width:450px;
+    padding:3rem;
+}
+
+.intro-link {
+    font-size:1.2rem;
+    font-weight: bold;
+    width: 400px;
+    height:2rem;
+    padding-left: 6rem;
+}
+.carousel-link {
+    font-size:1.2rem;
+    font-weight: bold;
+    width: 400px;
+    color:black;
+    text-decoration: none;
+}
+.carousel-image {
+    height:100%;
+    width:500px;
+}
+.header {
+}
+.footer {
+    width: 100%;
+    background-color: #95a5a6;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+.footer-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color:white;
+}
+
+/* Ensure the inner containers of the specific carousel respect the fixed height */
+#article-carousel .carousel-inner {
+    height: 100%;
+    width: 100%;
+}
+#article-carousel .carousel-item,
+#article-carousel .carousel-item.active,
+#article-carousel .carousel-item-next,
+#article-carousel .carousel-item-prev {
+    height: 100%;
+    width: 100%;
+}
+.btn {
+    padding: 0rem;
+}
+
+
+.a-list-item {
+    background-color: #ecf0f1;
+}
+.a-list-button {
+    width:100%;
+}
+.a-list-logo {
+    min-width:50px;
+    max-width:100px;
+}
+
+.analysis-text {
+    font-size:1rem;
+    width:100%;
+}
+
+.filter-dropdown {
+    height:50px;
+    width:200px;
+}
+
+.viz-background-card {
+    background-color:#ecf0f1;
+    padding:1rem;
+}
+
+.viz-markdown-card {
+    background-color:white;
+    padding:1rem;
+}
+
+.help-icon {
+    max-width:500px;
+}
+
+.tab-label {
+    font-size:1.1rem;
+    font-weight:bold !important;
+    background-color:#ecf0f1;
+    border:1px solid #95a5a6 !important;
+}
+
+.tab-label-active {
+    size:1.1rem;
+    font-weight: bold !important;
+    border:1px solid #95a5a6 !important;
+    background-color:#7b8a8b !important;
+    color:white !important;
+}
+
+.kpi-box-header {
+    background-color: #ecf0f1;
+    font-size:1.1rem;
+}
+
+.kpi-box-body {
+/*    background: radial-gradient(ellipse at center,  #86d7dc 35%,#f0f9ff 100%,#fd486d 100%);*/
+}
+
+.kpi-box-footer {
+    background-color: #ecf0f1;
+    padding:0;
+    
+}
+.kpi-box-value {
+    font-size:2rem;
+    font-weight:bold;
+}
+.percent-comp {
+    font-size:.8rem;
+    border:1px rgb(0 0 0 / 17%) solid;
+}
+
+.percent-comp-val {
+    font-size:1rem;
+    font-weight:bold !important;
+    background-color:white;
+    width:100%;
+}
+
+.percent-comp-text {
+}
+
+.hz-rule {
+    height:1px;
+    width:100%;
+    border:1px darkgray solid;
+}
+.vt-rule {
+    height:100%;
+    width:1px;
+    border:1px darkgray solid;
+}
+
+blockquote {
+    border-left: 4px grey solid;
+    background-color: whitesmoke;
+    padding: 1rem;
+    font-style:italic;
+}
+
+.alert-warning {
+    color: black;
+}
+
+.gen-table-cell {
+    overflow: scroll;
+    line-height: 1rem;
+}
+
+
+/* Hide MapLibre attribution */
+.mapboxgl-ctrl-attrib,
+.leaflet-control-attribution,
+.maplibregl-ctrl-attrib {
+    display: none !important;
+}
+.maplibregl-ctrl-attrib {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.ai-spinner {
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+}
+.ai-spinner:after {
+	content: " ";
+	display: block;
+	width: 46px;
+	height: 46px;
+	margin: 2px;
+	border-radius: 50%;
+	border: 4px solid #2bbccf;
+	border-color: #2bbccf transparent #2bbccf transparent;
+	animation: ai-spin 1.2s linear infinite;
+}
+@keyframes ai-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+.loading-text {
+	font-size: 1.1rem;
+	color: #2bbccf;
+	font-weight: 500;
+	margin-top: 1rem;
+}
+
+/* Modern Sidebar Navigation */
+.nav-pills-custom .nav-link {
+    color: #5a5a5a;
+    font-weight: 500;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-bottom: 5px;
+}
+
+.nav-pills-custom .nav-link:hover {
+    background-color: #e9ecef;
+    color: #2b2bcf; /* Brand color */
+    transform: translateX(5px);
+}
+
+.nav-pills-custom .nav-link.active {
+    background-color: #2b2bcf;
+    color: #ffffff;
+    box-shadow: 0 4px 6px rgba(43, 43, 207, 0.2);
+}
+
+/* Modern Tabs (Home & AI Pages) */
+.modern-tab-label {
+    color: #6c757d !important;
+    font-weight: 500 !important;
+    border: none !important;
+    background-color: transparent !important;
+    padding: 1rem 1.5rem;
+}
+
+.modern-tab-label-active {
+    color: #000 !important;
+    font-weight: bold !important;
+    border-top: 3px solid #18bc9c !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+}
+
+/* --------------------------------------------------------- */
+/* Fixed Sidebar (Portfolio / TOC Style)                     */
+/* --------------------------------------------------------- */
+.sidebar {
+    height: 100vh;
+    width: 260px;
+    background-color: #ffffff;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    z-index: 1030;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.sidebar-header {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.sidebar-logo {
+    height: 32px;
+    object-fit: contain;
+}
+
+.sidebar-nav {
+    padding: 0 1rem;
+}
+
+.sidebar-link {
+    color: #6c757d !important;
+    font-weight: 500;
+    padding: 10px 15px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.sidebar-link:hover {
+    color: #000 !important;
+    background-color: #f8f9fa !important;
+    transform: translateX(3px);
+}
+
+.sidebar-link.active {
+    color: #000 !important;
+    font-weight: 700;
+    background-color: transparent !important;
+    border-left: 3px solid #2b2bcf;
+    border-radius: 0 6px 6px 0 !important;
+    padding-left: 12px !important; /* Adjust for border */
+}
+
+.sidebar-text {
+    opacity: 1;
+    margin-left: 0;
+}
+
+.content-wrapper {
+    margin-left: 260px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+/* Employer Logos */
+.employer-logo {
+    max-height: 50px;
+    max-width: 150px;
+    filter: grayscale(100%);
+    opacity: 0.4;
+    transition: all 0.3s ease;
+}
+
+.employer-logo:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+}

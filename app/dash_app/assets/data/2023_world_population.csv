@@ -1,0 +1,238 @@
+country,alpha_3,alpha_2,population
+India,IND,IN, 1 431 703
+China,CHN,CN, 1 424 261
+United States of America,USA,US,  342 475
+Indonesia,IDN,ID,  280 026
+Pakistan,PAK,PK,  245 673
+Nigeria,NGA,NG,  225 495
+Brazil,BRA,BR,  210 707
+Bangladesh,BGD,BD,  170 427
+Russian Federation,RUS,RU,  145 675
+Mexico,MEX,MX,  129 171
+Ethiopia,ETH,ET,  127 028
+Japan,JPN,JP,  124 671
+Philippines,PHL,PH,  114 411
+Egypt,EGY,EG,  113 493
+Democratic Republic of the Congo,COD,CD,  104 063
+Viet Nam,VNM,VN,  100 029
+Iran (Islamic Republic of),IRN,IR,  90 103
+Türkiye,TUR,TR,  87 169
+Germany,DEU,DE,  84 401
+Thailand,THA,TH,  71 716
+United Kingdom,GBR,GB,  68 443
+France,FRA,FR,  66 381
+United Republic of Tanzania,TZA,TZ,  65 657
+South Africa,ZAF,ZA,  62 797
+Italy,ITA,IT,  59 564
+Kenya,KEN,KE,  54 794
+Myanmar,MMR,MM,  53 947
+Colombia,COL,CO,  52 033
+Republic of Korea,KOR,KR,  51 759
+Sudan,SDN,SD,  50 037
+Uganda,UGA,UG,  47 981
+Spain,ESP,ES,  47 907
+Algeria,DZA,DZ,  45 831
+Argentina,ARG,AR,  45 459
+Iraq,IRQ,IQ,  44 590
+Afghanistan,AFG,AF,  40 865
+Canada,CAN,CA,  39 060
+Poland,POL,PL,  38 814
+Yemen,YEM,YE,  38 794
+Ukraine,UKR,UA,  38 024
+Morocco,MAR,MA,  37 524
+Angola,AGO,AO,  36 187
+Uzbekistan,UZB,UZ,  35 294
+Malaysia,MYS,MY,  34 908
+Peru,PER,PE,  33 656
+Ghana,GHA,GH,  33 467
+Mozambique,MOZ,MZ,  33 141
+Saudi Arabia,SAU,SA,  32 867
+Madagascar,MDG,MG,  30 813
+Côte d'Ivoire,CIV,CI,  30 784
+Nepal,NPL,NP,  29 715
+Venezuela (Bolivarian Republic of),VEN,VE,  28 251
+Cameroon,CMR,CM,  27 998
+Dem. People's Republic of Korea,PRK,KP,  26 376
+Australia,AUS,AU,  26 321
+Niger,NER,NE,  25 727
+Mali,MLI,ML,  23 416
+"China, Taiwan Province of China",TWN,TW,  23 370
+Syrian Arab Republic,SYR,SY,  23 015
+Sri Lanka,LKA,LK,  22 905
+Burkina Faso,BFA,BF,  22 766
+Malawi,MWI,MW,  20 833
+Zambia,ZMB,ZM,  20 430
+Kazakhstan,KAZ,KZ,  20 196
+Chile,CHL,CL,  19 603
+Romania,ROU,RO,  19 169
+Chad,TCD,TD,  18 768
+Somalia,SOM,SO,  18 031
+Netherlands,NLD,NL,  18 019
+Guatemala,GTM,GT,  17 984
+Ecuador,ECU,EC,  17 902
+Senegal,SEN,SN,  17 867
+Cambodia,KHM,KH,  17 315
+Zimbabwe,ZWE,ZW,  16 203
+Guinea,GIN,GN,  14 229
+Benin,BEN,BJ,  13 934
+Rwanda,RWA,RW,  13 803
+Burundi,BDI,BI,  13 504
+Tunisia,TUN,TN,  12 161
+Bolivia (Plurinational State of),BOL,BO,  12 159
+Belgium,BEL,BE,  11 698
+Haiti,HTI,HT,  11 570
+Jordan,JOR,JO,  11 347
+Dominican Republic,DOM,DO,  11 283
+South Sudan,SSD,SS,  11 147
+Cuba,CUB,CU,  11 039
+Czechia,CZE,CZ,  10 828
+Honduras,HND,HN,  10 554
+Sweden,SWE,SE,  10 522
+United Arab Emirates,ARE,AE,  10 445
+Portugal,PRT,PT,  10 431
+Greece,GRC,GR,  10 349
+Azerbaijan,AZE,AZ,  10 332
+Papua New Guinea,PNG,PG,  10 296
+Tajikistan,TJK,TJ,  10 288
+Hungary,HUN,HU,  9 683
+Togo,TGO,TG,  9 196
+Israel,ISR,IL,  9 191
+Belarus,BLR,BY,  9 145
+Austria,AUT,AT,  9 136
+Switzerland,CHE,CH,  8 843
+Sierra Leone,SLE,SL,  8 368
+Lao People's Democratic Republic,LAO,LA,  7 612
+"China, Hong Kong SAR",HKG,HK,  7 452
+Turkmenistan,TKM,TM,  7 298
+Libya,LBY,LY,  7 269
+Kyrgyzstan,KGZ,KG,  7 016
+Bulgaria,BGR,BG,  6 813
+Paraguay,PRY,PY,  6 802
+Serbia,SRB,RS,  6 788
+Nicaragua,NIC,NI,  6 777
+El Salvador,SLV,SV,  6 295
+Congo,COG,CG,  6 108
+Denmark,DNK,DK,  5 932
+Singapore,SGP,SG,  5 766
+Lebanon,LBN,LB,  5 761
+Finland,FIN,FI,  5 590
+Slovakia,SVK,SK,  5 517
+Norway,NOR,NO,  5 489
+Liberia,LBR,LR,  5 433
+State of Palestine,PSE,PS,  5 368
+Ireland,IRL,IE,  5 166
+New Zealand,NZL,NZ,  5 151
+Costa Rica,CRI,CR,  5 093
+Central African Republic,CAF,CF,  5 065
+Mauritania,MRT,MR,  4 948
+Oman,OMN,OM,  4 933
+Kuwait,KWT,KW,  4 793
+Panama,PAN,PA,  4 430
+Croatia,HRV,HR,  3 903
+Georgia,GEO,GE,  3 807
+Eritrea,ERI,ER,  3 439
+Mongolia,MNG,MN,  3 410
+Uruguay,URY,UY,  3 389
+Puerto Rico,PRI,PR,  3 240
+Bosnia and Herzegovina,BIH,BA,  3 194
+Republic of Moldova,MDA,MD,  3 081
+Qatar,QAT,QA,  2 946
+Namibia,NAM,NA,  2 928
+Armenia,ARM,AM,  2 902
+Lithuania,LTU,LT,  2 841
+Jamaica,JAM,JM,  2 840
+Albania,ALB,AL,  2 822
+Gambia,GMB,GM,  2 667
+Botswana,BWA,BW,  2 460
+Gabon,GAB,GA,  2 458
+Lesotho,LSO,LS,  2 298
+Guinea-Bissau,GNB,GW,  2 129
+Slovenia,SVN,SI,  2 118
+Latvia,LVA,LV,  1 885
+North Macedonia,MKD,MK,  1 836
+Equatorial Guinea,GNQ,GQ,  1 825
+Kosovo (under UNSC res. 1244),XKX,XK,  1 709
+Bahrain,BHR,BH,  1 552
+Trinidad and Tobago,TTO,TT,  1 500
+Timor-Leste,TLS,TL,  1 377
+Estonia,EST,EE,  1 367
+Cyprus,CYP,CY,  1 338
+Mauritius,MUS,MU,  1 275
+Eswatini,SWZ,SZ,  1 225
+Djibouti,DJI,DJ,  1 145
+Fiji,FJI,FJ,   922
+Réunion,REU,RE,   873
+Comoros,COM,KM,   842
+Guyana,GUY,GY,   824
+Solomon Islands,SLB,SB,   790
+Bhutan,BTN,BT,   784
+"China, Macao SAR",MAC,MO,   709
+Luxembourg,LUX,LU,   661
+Montenegro,MNE,ME,   628
+Suriname,SUR,SR,   626
+Western Sahara,ESH,EH,   574
+Malta,MLT,MT,   530
+Maldives,MDV,MV,   525
+Cabo Verde,CPV,CV,   521
+Brunei Darussalam,BRN,BN,   457
+Belize,BLZ,BZ,   408
+Bahamas,BHS,BS,   399
+Iceland,ISL,IS,   384
+Guadeloupe,GLP,GP,   377
+Martinique,MTQ,MQ,   347
+Vanuatu,VUT,VU,   317
+Mayotte,MYT,YT,   311
+French Guiana,GUF,GF,   301
+New Caledonia,NCL,NC,   288
+Barbados,BRB,BB,   282
+French Polynesia,PYF,PF,   281
+Sao Tome and Principe,STP,ST,   229
+Samoa,WSM,WS,   216
+Curaçao,CUW,CW,   185
+Saint Lucia,LCA,LC,   179
+Guam,GUM,GU,   166
+Kiribati,KIR,KI,   132
+Seychelles,SYC,SC,   127
+Grenada,GRD,GD,   117
+Micronesia (Fed. States of),FSM,FM,   112
+Aruba,ABW,AW,   108
+Tonga,TON,TO,   105
+Jersey,JEY,JE,   104
+Saint Vincent and the Grenadines,VCT,VC,   102
+Antigua and Barbuda,ATG,AG,   93
+United States Virgin Islands,VIR,VI,   86
+Isle of Man,IMN,IM,   84
+Andorra,AND,AD,   80
+Cayman Islands,CYM,KY,   72
+Dominica,DMA,DM,   67
+Bermuda,BMU,BM,   65
+Guernsey,GGY,GG,   64
+Greenland,GRL,GL,   56
+Faroe Islands,FRO,FO,   54
+American Samoa,ASM,AS,   48
+Saint Kitts and Nevis,KNA,KN,   47
+Turks and Caicos Islands,TCA,TC,   46
+Northern Mariana Islands,MNP,MP,   46
+Sint Maarten (Dutch part),SXM,SX,   42
+Marshall Islands,MHL,MH,   39
+Liechtenstein,LIE,LI,   39
+Monaco,MCO,MC,   39
+British Virgin Islands,VGB,VG,   39
+Gibraltar,GIB,GI,   38
+San Marino,SMR,SM,   34
+"Bonaire, Sint Eustatius and Saba",BES,BQ,   29
+Saint Martin (French part),MAF,MF,   28
+Palau,PLW,PW,   18
+Cook Islands,COK,CK,   14
+Anguilla,AIA,AI,   14
+Nauru,NRU,NR,   12
+Wallis and Futuna Islands,WLF,WF,   11
+Saint Barthélemy,BLM,BL,   11
+Tuvalu,TUV,TV,   10
+Saint Pierre and Miquelon,SPM,PM,   6
+Saint Helena,SHN,SH,   5
+Montserrat,MSR,MS,   4
+Falkland Islands (Malvinas),FLK,FK,   3
+Tokelau,TKL,TK,   2
+Niue,NIU,NU,   2
+Holy See,VAT,VA,   1
