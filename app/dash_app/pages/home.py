@@ -79,7 +79,7 @@ class UInterface:
 		analyses_content = self.create_article_content()
 		self.conf['panels']['analyses'] = {
 			'display_name': 'Analyses',
-			'summary_header': 'Press coverage of analyses my teams and I have performed',
+			'summary_header': 'Select press coverage of analyses my teams and I have performed',
 			'summary_text': None,
 			'image': None,
 			'enabled': True,
@@ -251,6 +251,7 @@ class UInterface:
 	def create_article_content(self):
 		alist_buttons = []
 		carousel_images = []
+		summary_header = 'Select press coverage of analyses my teams and I have performed'
 		a_count = 0
 		i_count = 0
 		for k,v in self.conf['articles'].items():
@@ -282,6 +283,8 @@ class UInterface:
 				i_count = i_count + 1
 			a_count = a_count + 1
 			content_left = dbc.Stack([
+				html.Span(summary_header,style={'font-size':'1.1rem'}),
+				html.Hr(),
 				dbc.Nav(
 					alist_buttons,
 					vertical=True,pills=True
