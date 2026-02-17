@@ -54,7 +54,7 @@ if DEPLOY_ENV.lower() == 'dev':
 REDIS_URL = os.environ['REDIS_URL']
 SERVER_NAME = os.environ.get('SERVER_NAME')
 BASE_PATH = f'/{APP_SLUG}'
-FLASK_SECRET_KEY = os.environ['FLASK_SECRET_KEY']
+FLASK_SECRET_KEY = os.environ['FLASK_SECRET_KEY'] 
 # Boolean flag from env; accepts 1/true/yes/on
 ENABLE_GOOGLE_AUTH = os.getenv('ENABLE_GOOGLE_AUTH', 'false').strip().lower() in ('1', 'true', 'yes', 'on')
 redis_client = redis.from_url(REDIS_URL)
