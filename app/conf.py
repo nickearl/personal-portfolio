@@ -21,7 +21,7 @@ load_dotenv(find_dotenv())
 
 SERVER_NAME = os.environ['SERVER_NAME'].lower()
 DISPLAY_NAME = "Nick Earl Portfolio | Building AI & Data Solutions for Media Giants and High Growth Startups | Fractional Data & AI Leadership"
-BASE_PATH = re.sub(r'[_\s]+', '-', SERVER_NAME)
+BASE_PATH = 'portfolio'
 
 class GlobalUInterface:
 	def __init__(self):

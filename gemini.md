@@ -2,6 +2,12 @@
 
 This file contains context and architectural notes for the `personal-portfolio` repository to assist AI agents.
 
+## ✅ Deployment Status
+
+*   **Status:** Live & Operational (Feb 2026).
+*   **Infrastructure:** Google Compute Engine VM running Docker Compose.
+*   **CI/CD:** Fully automated via GitHub Actions (Build -> Push to GAR -> SSH Deploy).
+
 ## Project Overview
 
 *   **Name:** `personal-portfolio`
@@ -68,8 +74,12 @@ This file contains context and architectural notes for the `personal-portfolio` 
 ## Infrastructure
 
 *   **Containerization:** Dockerfile defines the runtime environment.
-*   **IaC:** Terraform manages GCP resources (Cloud Run, Redis, Secret Manager).
-*   **CI/CD:** GitHub Actions triggers builds on push.
+*   **IaC:** Terraform manages GCP resources:
+    *   **Compute Engine:** VM instance (`e2-small`) with `pd-balanced` disk.
+    *   **Networking:** Static IP, Firewall rules (HTTP/HTTPS/SSH).
+    *   **Storage:** Artifact Registry (Docker images), GCS (Terraform state).
+    *   **Security:** Secret Manager (GitHub PAT, App Secrets), Workload Identity Federation.
+*   **CI/CD:** GitHub Actions triggers builds on push to `main`.
 
 - **Sales Enablement / Slide Deck Generation:**
     - The `python-pptx` approach produced only marginally acceptable results.

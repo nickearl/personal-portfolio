@@ -15,7 +15,7 @@ from flask.helpers import get_root_path
 from celery import Celery, Task
 import pandas as pd
 import plotly.io as pio
-from conf import GlobalUInterface, DISPLAY_NAME
+from conf import GlobalUInterface, DISPLAY_NAME, BASE_PATH as APP_SLUG
 from auth import is_app_authenticated
 load_dotenv(find_dotenv())
 
@@ -53,7 +53,7 @@ if DEPLOY_ENV.lower() == 'dev':
 	os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 REDIS_URL = os.environ['REDIS_URL']
 SERVER_NAME = os.environ.get('SERVER_NAME')
-BASE_PATH = f'/{re.sub(r'[_\s]+', '-', SERVER_NAME).lower()}'
+BASE_PATH = f'/{APP_SLUG}'
 FLASK_SECRET_KEY = os.environ['FLASK_SECRET_KEY']
 # Boolean flag from env; accepts 1/true/yes/on
 ENABLE_GOOGLE_AUTH = os.getenv('ENABLE_GOOGLE_AUTH', 'false').strip().lower() in ('1', 'true', 'yes', 'on')
@@ -133,8 +133,8 @@ def create_celery_server(server):
 def create_dash_app(server):
 
 	from dash_app.callbacks import register_callbacks
-	logger.info(f'Creating Dash app: {SERVER_NAME} at /{SERVER_NAME.replace(" ","-").lower()}/')
-	register_dash_app(server, 'dash_app', SERVER_NAME, SERVER_NAME.replace(' ','-').lower(), assemble_dash_app_from_components, register_callbacks)
+	logger.info(f'Creating Dash app: {SERVER_NAME} at /{APP_SLUG}/')
+	register_dash_app(server, 'dash_app', SERVER_NAME, APP_SLUG, assemble_dash_app_from_components, register_callbacks)
 
 	return server
 
