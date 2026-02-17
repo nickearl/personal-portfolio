@@ -20,6 +20,18 @@ locals {
     IMAGE_PATH    = var.gar_image_path
   })
   port = var.port
+  proxy_target   = "app:${var.port}"
+  nginx_http_conf = templatefile("${path.module}/../../scripts/nginx/conf.d/default-http.conf.tftpl", {
+    domain_name         = var.domain_name
+    proxy_target        = local.proxy_target
+  })
+
+  nginx_ssl_conf = templatefile("${path.module}/../../scripts/nginx/conf.d/default-ssl.conf.tftpl", {
+    domain_name       = var.domain_name
+    proxy_target      = local.proxy_target
+    port              = var.port
+  })
+
 }
 
 resource "google_compute_address" "static_ip" {
@@ -41,7 +53,8 @@ resource "google_compute_instance" "app_server" {
   boot_disk {
     initialize_params {
       image = var.boot_image
-      size  = 30
+      size  = var.boot_disk_size_gb
+      type  = "pd-balanced"
     }
   }
 
@@ -54,15 +67,44 @@ resource "google_compute_instance" "app_server" {
     }
   }
 
-  metadata_startup_script = data.template_file.startup_script.rendered
-
   metadata = {
-    enable-oslogin = "TRUE"
-    ssh-keys       = var.github_actions_public_key != "" ? "${var.ssh_user}:${var.github_actions_public_key}" : null
+    enable-oslogin = "FALSE"
+    ssh-keys       = trimspace(join("\n", compact([
+      var.github_actions_public_key != "" ? "${var.ssh_user}:${var.github_actions_public_key}" : "",
+      "${var.ssh_user}:${file("${pathexpand(var.ssh_private_key_path)}.pub")}"
+    ])))
   }
 
   service_account {
     scopes = ["cloud-platform"]
+  }
+}
+
+resource "null_resource" "provision_vm" {
+  depends_on = [google_compute_instance.app_server]
+
+  triggers = {
+    script_hash = sha256(data.template_file.startup_script.rendered)
+    instance_id = google_compute_instance.app_server.id
+  }
+
+  connection {
+    type        = "ssh"
+    user        = var.ssh_user
+    private_key = file(pathexpand(var.ssh_private_key_path))
+    host        = google_compute_instance.app_server.network_interface.0.access_config.0.nat_ip
+  }
+
+  provisioner "file" {
+    content     = data.template_file.startup_script.rendered
+    destination = "/tmp/startup.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/startup.sh",
+      "sudo /tmp/startup.sh"
+    ]
   }
 }
 
@@ -89,31 +131,33 @@ resource "google_project_iam_member" "vm_secretmanager_access" {
   member  = "serviceAccount:${data.google_compute_default_service_account.default.email}"
 }
 
+resource "google_project_iam_member" "vm_artifact_registry_reader" {
+  project = var.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${data.google_compute_default_service_account.default.email}"
+}
+
 resource "google_project_iam_member" "vm_token_writer" {
   project   = var.project_id
   role      = "roles/secretmanager.secretVersionAdder"
   member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
 }
 
-
-
-data "google_secret_manager_secret_version" "contact_email" {
-  secret  = "contact-email"
-  version = "latest"
-}
-
-
 data "template_file" "startup_script" {
   template = file("${path.module}/../../scripts/startup.sh.tftpl")
 
   vars = {
     domain_name     = var.domain_name
-    contact_email   = data.google_secret_manager_secret_version.contact_email.secret_data
+    contact_email   = var.contact_email
     server_name     = var.server_name
     ip              = google_compute_address.static_ip.address
     dotenv_file     = local.dotenv
     compose_file    = local.compose_file
     port            = local.port
     ssh_user        = var.ssh_user
+    nginx_http_conf = local.nginx_http_conf
+    nginx_ssl_conf  = local.nginx_ssl_conf
+    region          = var.region
+    bucket_name     = var.bucket_name
   }
 }

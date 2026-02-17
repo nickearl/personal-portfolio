@@ -46,19 +46,17 @@ variable "bucket_name" {
 variable "artifact_registry_repo_name" {
   description = "Name of the Google Artifact Registry repository for Docker images"
   type        = string
-  default     = "base-insights-repo"
 }
 
 variable "image_name" {
   description = "Name of the Docker image and container"
   type        = string
-  default     = "base-insights-app"
 }
 
 variable "port" {
   description = "Port to use for nginx proxy_pass to internal app"
   type        = string
-  default     = 5309
+  default     = "1701"
 }
 
 variable "machine_type" {

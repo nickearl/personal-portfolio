@@ -58,16 +58,7 @@ resource "google_artifact_registry_repository" "docker_repo" {
 }
 
 resource "local_file" "github_workflow" {
-  content = templatefile("${path.module}/scripts/deploy.yml.tftpl", {
-    project_id  = var.project_id
-    region      = var.region
-    repo_name   = var.artifact_registry_repo_name
-    image_name  = var.image_name
-    vm_name     = var.server_name
-    vm_zone     = var.zone
-    port        = var.port
-    ssh_user    = var.ssh_user
-  })
+  content  = file("${path.module}/scripts/deploy.yml.tftpl")
   filename = "${path.module}/../.github/workflows/deploy.yml"
 }
 
@@ -80,9 +71,13 @@ resource "google_service_account" "github_actions" {
   project      = var.project_id
 }
 
+resource "random_id" "wif_suffix" {
+  byte_length = 4
+}
+
 # 2. Workload Identity Pool
 resource "google_iam_workload_identity_pool" "github_pool" {
-  workload_identity_pool_id = "github-pool-insights"
+  workload_identity_pool_id = "github-pool-${random_id.wif_suffix.hex}"
   display_name              = "GitHub Actions Pool"
   project                   = var.project_id
   depends_on                = [google_project_service.services]
@@ -156,6 +151,56 @@ resource "github_actions_secret" "gcp_ssh_private_key" {
   plaintext_value = tls_private_key.github_deploy_key.private_key_openssh
 }
 
+# --- GitHub Actions Variables ---
+
+resource "github_actions_variable" "gcp_project_id" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "GCP_PROJECT_ID"
+  value         = var.project_id
+}
+
+resource "github_actions_variable" "gcp_region" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "GCP_REGION"
+  value         = var.region
+}
+
+resource "github_actions_variable" "artifact_registry_repo_name" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "ARTIFACT_REGISTRY_REPO_NAME"
+  value         = var.artifact_registry_repo_name
+}
+
+resource "github_actions_variable" "image_name" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "IMAGE_NAME"
+  value         = var.image_name
+}
+
+resource "github_actions_variable" "gcp_vm_name" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "GCP_VM_NAME"
+  value         = var.server_name
+}
+
+resource "github_actions_variable" "gcp_vm_zone" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "GCP_VM_ZONE"
+  value         = var.zone
+}
+
+resource "github_actions_variable" "port" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "PORT"
+  value         = var.port
+}
+
+resource "github_actions_variable" "ssh_user" {
+  repository    = split("/", var.github_repo)[1]
+  variable_name = "SSH_USER"
+  value         = var.ssh_user
+}
+
 # --- Application Secrets Generation ---
 
 resource "random_password" "flask_secret_key" {
@@ -200,9 +245,9 @@ module "server_vm" {
 resource "cloudflare_record" "app_dns" {
   zone_id = var.cloudflare_zone_id
   name    = split(".", var.domain_name)[0]
-  value   = module.server_vm.static_ip
+  content = module.server_vm.static_ip
   type    = "A"
-  proxied = true
+  proxied = false
 }
 
 output "reserved_static_ip" {

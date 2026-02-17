@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
   fi && \
   uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
-COPY . .
+COPY app .
 ENV PORT=1701
 EXPOSE 1701
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

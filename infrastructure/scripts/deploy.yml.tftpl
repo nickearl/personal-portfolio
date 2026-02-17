@@ -7,12 +7,12 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${project_id}
-  REGION: ${region}
-  GAR_LOCATION: ${region}-docker.pkg.dev/${project_id}/${repo_name}
-  IMAGE: ${image_name}
-  VM_NAME: ${vm_name}
-  ZONE: ${vm_zone}
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GCP_REGION }}
+  GAR_LOCATION: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO_NAME }}
+  IMAGE: ${{ vars.IMAGE_NAME }}
+  VM_NAME: ${{ vars.GCP_VM_NAME }}
+  ZONE: ${{ vars.GCP_VM_ZONE }}
 
 jobs:
   deploy:
@@ -30,8 +30,8 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: $${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: $${{ secrets.GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -42,8 +42,7 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t "$GAR_LOCATION/$IMAGE:$${{ github.sha }}" -t "$GAR_LOCATION/$IMAGE:latest" .
-          docker push "$GAR_LOCATION/$IMAGE:$${{ github.sha }}"
+          docker build -t "$GAR_LOCATION/$IMAGE:latest" -f app/Dockerfile .
           docker push "$GAR_LOCATION/$IMAGE:latest"
 
       - name: Get VM IP
@@ -55,13 +54,14 @@ jobs:
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: $${{ steps.get-ip.outputs.vm_ip }}
-          username: ${ssh_user}
-          key: $${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          host: ${{ steps.get-ip.outputs.vm_ip }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           script: |
-            gcloud auth configure-docker ${region}-docker.pkg.dev --quiet
-            docker pull $GAR_LOCATION/$IMAGE:$${{ github.sha }}
-            docker stop $IMAGE || true
-            docker rm $IMAGE || true
-            docker run -d --name $IMAGE --restart always -p ${port}:1701 --env-file .env $GAR_LOCATION/$IMAGE:$${{ github.sha }}
+            export GITHUB_TOKEN=$(gcloud secrets versions access latest --secret="github-pat" 2>/dev/null || echo "")
+            gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+            cd /opt/${{ vars.GCP_VM_NAME }}
+            docker compose pull
+            docker compose up -d
+            docker exec nginx nginx -s reload || true
             docker image prune -a -f --filter "until=24h"

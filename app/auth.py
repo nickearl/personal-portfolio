@@ -49,7 +49,7 @@ GOOGLE_SCOPES = [
 
 # ---------- Secret Manager helpers (OAuth client JSON) ----------
 def _read_secret_json(secret_name: str, version: str = 'latest', project_id: str | None = None) -> dict:
-	project_id = project_id or os.getenv('GCP_PROJECT') or os.getenv('GOOGLE_CLOUD_PROJECT')
+	project_id = project_id or os.getenv('GCP_PROJECT') or os.getenv('GOOGLE_CLOUD_PROJECT') or os.getenv('PROJECT_ID')
 	
 	# If env vars are missing, try to auto-detect from GCloud environment
 	if not project_id:
@@ -59,7 +59,7 @@ def _read_secret_json(secret_name: str, version: str = 'latest', project_id: str
 			pass
 
 	if not project_id:
-		raise RuntimeError('GCP project id not set (GCP_PROJECT or GOOGLE_CLOUD_PROJECT). Are you signed in to gcloud cli?')
+		raise RuntimeError('GCP project id not set (GCP_PROJECT, GOOGLE_CLOUD_PROJECT, or PROJECT_ID). Are you signed in to gcloud cli?')
 	client = secretmanager.SecretManagerServiceClient()
 	name = f'projects/{project_id}/secrets/{secret_name}/versions/{version}'
 	resp = client.access_secret_version(request={'name': name})

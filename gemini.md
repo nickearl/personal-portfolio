@@ -1,10 +1,10 @@
-# Gemini Context: BI Demo 2026
+# Gemini Context: Personal Portfolio
 
-This file contains context and architectural notes for the `bi-demo-2026` repository to assist AI agents.
+This file contains context and architectural notes for the `personal-portfolio` repository to assist AI agents.
 
 ## Project Overview
 
-*   **Name:** `bi-demo-2026`
+*   **Name:** `personal-portfolio`
 *   **Type:** Flask application embedding a Plotly Dash multipage app.
 *   **Goal:** A professional portfolio and technical demonstration platform showcasing capabilities in Data Engineering, BI, and AI/LLM integration.
 *   **Stack:** Python 3.13, Flask, Dash, Redis, Celery, Pandas.

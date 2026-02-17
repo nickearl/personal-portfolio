@@ -63,14 +63,28 @@ cat > "/opt/${server_name}/nginx/conf.d/default.conf" <<'EOF'
 ${nginx_http_conf}
 EOF
 
+cd "/opt/${server_name}"
+
+# Fetch GitHub Token for private repo access / secrets
+echo "Fetching GitHub token..."
+GITHUB_TOKEN=""
+if ! GITHUB_TOKEN=$(gcloud secrets versions access latest --secret="github-pat" 2>/dev/null); then
+  echo "⚠️ Warning: Could not fetch 'github-pat' from Secret Manager."
+fi
+export GITHUB_TOKEN
+
 # Configure Docker Auth for Artifact Registry
 gcloud auth configure-docker ${region}-docker.pkg.dev --quiet
 
-# Start docker stack
+# Start docker stack (HTTP mode)
 echo "Starting Docker stack..."
-cd "/opt/${server_name}"
 docker compose pull || true
-docker compose up -d
+if ! docker compose up -d; then
+  echo "⚠️ Full stack start failed (likely missing app image). Attempting to start Nginx only..."
+  docker compose up -d nginx
+fi
+
+rm -f /tmp/github_token
 
 # Get External IP
 IP=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
@@ -137,6 +151,6 @@ ${nginx_ssl_conf}
 EOF
 
 # Reload nginx to apply new cert
-docker exec nginx nginx -s reload
+docker exec nginx nginx -s reload || echo "⚠️ Nginx reload failed (likely due to missing upstream app). This is expected on first boot."
 
 echo "Provisioning complete."
