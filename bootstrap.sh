@@ -1,31 +1,14 @@
 #!/bin/bash
+# Plan/apply the infrastructure. Extra args pass through, e.g. ./bootstrap.sh plan
 set -euo pipefail
+cd "$(dirname "$0")/infrastructure"
 
-echo "🔧 Terraform bootstrap (no SSL, VM-only)"
-# Ensure terraform exists
 command -v terraform >/dev/null || { echo "terraform not found"; exit 1; }
 
-echo "🔧 Initializing Terraform..."
-BUCKET_NAME=$(grep bucket_name terraform.tfvars | cut -d\" -f2)
-PREFIX=$(grep server_name terraform.tfvars | cut -d\" -f2)
-terraform init \
-  -backend-config="bucket=${BUCKET_NAME}" \
-  -backend-config="prefix=${PREFIX}/state" \
-  -reconfigure
+# github provider auth, and the account-wide Cloudflare token kept in Secret Manager
+export GITHUB_TOKEN="$(gh auth token)"
+export TF_VAR_cloudflare_api_token="$(gcloud secrets versions access latest --secret=cloudflare-api-token)"
 
-# macOS-specific fix: ensure provider binaries are executable
-chmod -R +x .terraform/providers || true
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  echo "📦 macOS detected: removing quarantine flag on .terraform directory..."
-  xattr -dr com.apple.quarantine .terraform/ || true
-fi
-
-echo "🚀 Proceeding with full Terraform apply..."
-terraform apply -auto-approve
-
-echo ""
-echo "---------------------------------------------------"
-echo "✅ Infrastructure updated."
-echo "To view the GitHub Secrets (including Private Key), run:"
-echo "terraform output -raw github_secrets"
-echo "---------------------------------------------------"
+# Backend bucket/prefix come from backend.tf
+terraform init -input=false
+terraform "${@:-apply}"

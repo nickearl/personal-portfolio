@@ -11,9 +11,13 @@ logger = logging.getLogger(__name__)
 
 def load_secret(secret_name: str, version: str = "latest") -> str:
 	"""
-	Load a secret from Google Secret Manager.
-	Falls back to environment variable if GSM fails or project ID is missing.
+	Load a secret from the environment (Cloud Run injects Secret Manager values as env vars).
+	Falls back to reading Google Secret Manager directly.
 	"""
+	value = os.getenv(secret_name)
+	if value:
+		return value.strip()
+
 	project_id = os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCS_PROJECT_ID") or os.getenv("GCP_PROJECT")
 	
 	if not project_id:
@@ -35,8 +39,8 @@ def load_secret(secret_name: str, version: str = "latest") -> str:
 			logger.error(f"GSM Access failed: {e}")
 	else:
 		logger.error(f"No Project ID found. Cannot access Secret Manager for {secret_name}")
-	
-	return os.getenv(secret_name, "")
+
+	return ""
 
 def normalize_email_column(series: pd.Series) -> pd.Series:
 	"""

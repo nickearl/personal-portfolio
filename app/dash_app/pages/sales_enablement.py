@@ -30,7 +30,6 @@ except ImportError:
 # Get environment variables
 load_dotenv(find_dotenv())
 PAGE = 'sales_enablement'
-REDIS_URL = os.environ['REDIS_URL']
 pd.set_option('future.no_silent_downcasting', True)
 
 logger = logging.getLogger(__name__)
