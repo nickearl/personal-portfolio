@@ -38,8 +38,8 @@ This file contains context and architectural notes for the `personal-portfolio` 
     *   It imports the UI classes from `pages/` to access component IDs.
 
 5.  **Long-running AI callbacks run inside the request:**
-    *   There is no task queue. Slow Gemini calls (up to ~2 min for the sales deck) run as regular Dash callbacks with `running=` spinners.
-    *   Cloud Run's request timeout (300s, Terraform) and gunicorn's `--timeout` (app/Dockerfile) must stay at least as long as the slowest callback.
+    *   There is no task queue. Slow Gemini calls (~3.5 min observed for the sales deck) run as regular Dash callbacks with `running=` spinners.
+    *   Cloud Run's request timeout (600s, Terraform) and gunicorn's `--timeout` (app/Dockerfile) must stay at least as long as the slowest callback.
 
 ## Content & Features
 

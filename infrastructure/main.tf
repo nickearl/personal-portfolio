@@ -246,7 +246,7 @@ resource "google_cloud_run_v2_service" "app" {
   template {
     service_account = google_service_account.app_runtime.email
     # AI demo callbacks run inside the request; matches gunicorn's --timeout in app/Dockerfile
-    timeout                          = "300s"
+    timeout                          = "600s"
     max_instance_request_concurrency = 16 # gunicorn: 2 workers x 8 threads
 
     scaling {

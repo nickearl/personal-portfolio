@@ -27,5 +27,5 @@ con.close()
 PY
 
 # AI demo callbacks run inside the request (no task queue), so the timeout must cover the
-# slowest one: the sales deck makes up to 6 sequential Gemini calls. Cloud Run's request timeout matches.
-CMD exec gunicorn app:server -b 0.0.0.0:${PORT} --workers 2 --threads 8 --timeout 300
+# slowest one: the sales deck makes up to 6 sequential Gemini calls (~3.5 min observed). Cloud Run's request timeout matches.
+CMD exec gunicorn app:server -b 0.0.0.0:${PORT} --workers 2 --threads 8 --timeout 600
