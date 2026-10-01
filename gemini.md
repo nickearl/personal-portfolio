@@ -44,7 +44,6 @@ This file contains context and architectural notes for the `personal-portfolio` 
 
 *   **Home / Portfolio (`pages/home.py`):**
     *   Landing page with professional introduction.
-    *   **Interactive Resume:** Data sourced from `assets/data/resume.json`. Parsed and rendered dynamically.
     *   **Press Coverage:** Carousel of articles and media mentions.
 *   **AI Demonstrations (`pages/ai.py`):**
     *   **Generative UI:** Using OpenAI to generate color themes and CSS on the fly based on user prompts.
@@ -61,7 +60,7 @@ This file contains context and architectural notes for the `personal-portfolio` 
 ## Directory Map
 
 *   `app/`: Application source.
-*   `app/dash_app/assets/`: CSS, Images, and Data Files (`resume.json`).
+*   `app/dash_app/assets/`: CSS, images, and demo data files.
 *   `app/dash_app/pages/`: Dashboard logic.
 *   `modules/`: Terraform infrastructure modules.
 
@@ -69,7 +68,7 @@ This file contains context and architectural notes for the `personal-portfolio` 
 
 *   **OpenAI API:** Used for text and image generation.
 *   **ElevenLabs API:** Used for voice synthesis and conversational AI.
-*   **Local Data:** `resume.json` acts as the primary data source for the portfolio section, treated as a structured document store.
+*   **Personal data:** none in this repo. It is public. Career data and the AI clone's knowledge base live in private repos.
 
 ## Infrastructure
 
