@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os, json, random, re, base64, io, uuid, time, socket, calendar, logging
+import os, json, random, re, base64, io, uuid, time, socket, calendar, logging, hmac, hashlib
 import pathlib
 from dotenv import load_dotenv, find_dotenv
 import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, State, ALL, MATCH, Patch, callback
 from dash.exceptions import PreventUpdate
+import flask
 import plotly.io as pio
 import plotly.graph_objects as go
 import plotly.express as px
@@ -30,6 +31,8 @@ except ImportError:
 # Get environment variables
 load_dotenv(find_dotenv())
 PAGE = 'sales_enablement'
+TEXT_MODEL = 'gemini-3.8-flash'
+IMAGE_MODEL = 'gemini-3.1-flash-image'
 pd.set_option('future.no_silent_downcasting', True)
 
 logger = logging.getLogger(__name__)
@@ -69,17 +72,13 @@ class UInterface:
 			'traffic_daily': pd.read_csv(self.base_dir / 'assets' / 'data' / 'traffic_daily.csv'),
 		}
 
-		example_items = [
-			{"key": "1", "src": "assets/images/weyland-yutani_1.jpeg", "img_style": {"height": "500px", "width": "100%", "object-fit": "contain"}},
-			{"key": "2", "src": "assets/images/weyland-yutani_2.jpeg", "img_style": {"height": "500px", "width": "100%", "object-fit": "contain"}},
-			{"key": "3", "src": "assets/images/weyland-yutani_3.jpeg", "img_style": {"height": "500px", "width": "100%", "object-fit": "contain"}},
-			{"key": "4", "src": "assets/images/weyland-yutani_4.jpeg", "img_style": {"height": "500px", "width": "100%", "object-fit": "contain"}},
-			{"key": "5", "src": "assets/images/weyland-yutani_5.jpeg", "img_style": {"height": "500px", "width": "100%", "object-fit": "contain"}},
-		]
-		self.example_carousel = dbc.Carousel(items=example_items, controls=True, indicators=True, variant="dark")
 		self.default_plaque = self._create_plaque(
 			"Weyland-Yutani", "Heavy Industry", "Technical Team", "Cyberpunk", "Short and funny"
 		)
+		self.example_deck = html.Div([
+			self.deck_grid([(None, self.slide_image(f'assets/images/weyland-yutani_{n}.jpeg')) for n in range(1, 6)]),
+			self.default_plaque,
+		])
 
 		self.layout = {
 			'header': dbc.Stack([
@@ -127,7 +126,7 @@ class UInterface:
 						1.  Describe the Prospect Company, Industry, Target Audience, Visual Style, and Length/Detail.
 						2.  Click **Generate Deck**.
 						
-						Gemini plans a 5-slide deck and generates high-fidelity slide images using Imagen 3.
+						Gemini plans a 3-5 slide deck from platform data, then renders every slide at once with Gemini 3.1 Flash Image. Slides appear as they finish.
 					"""),
 				]),
 				dbc.ModalFooter(
@@ -168,16 +167,17 @@ class UInterface:
 								id='sales-pitch-loading',
 								children=[
 									html.Div(
-										[self.example_carousel, self.default_plaque],
+										self.example_deck,
 										id='sales-pitch-output',
 										style={'padding': '2rem', 'background-color': '#f8f9fa', 'border-radius': '0.5rem', 'min-height': '400px'}
 									),
-									dcc.Download(id='sales-download-deck'),
 								],
+								# Only the planning step blocks the panel; slides then fill in one by one
+								target_components={'sales-pitch-output': 'children'},
 								custom_spinner=html.Div([
 									html.Div(className="ai-spinner"),
-									html.Div("Generating Pitch Deck...", className="loading-text"),
-									html.Div("Gemini is analyzing data and rendering slides.", className="text-muted small")
+									html.Div("Planning Pitch Deck...", className="loading-text"),
+									html.Div("Gemini is drafting slides from platform data.", className="text-muted small")
 								], className="d-flex flex-column align-items-center justify-content-center p-5 bg-white shadow rounded"),
 								overlay_style={"visibility":"visible", "filter": "blur(4px)", "opacity": "0.8", "background-color": "white"},
 							)
@@ -199,18 +199,20 @@ class UInterface:
 			], gap=3)
 		], className="mt-4 p-4 rounded shadow-sm", style={'background-color': '#e9ecef', 'border-left': '5px solid #6c757d'})
 
-	def ai_generate_deck(self, company, industry, audience, style, length):
-		logger.info(f'Generating sales deck for {company}')
+	def _client(self):
 		api_key = load_secret("GEMINI_API_KEY")
-		if api_key:
-			logger.debug(f"GEMINI_API_KEY loaded. Length: {len(api_key)}")
-			api_key = api_key.strip()
-		else:
+		if not api_key:
 			logger.error("GEMINI_API_KEY is None or empty.")
+			return None
+		return genai.Client(api_key=api_key)
+
+	def plan_deck(self, company, industry, audience, style, length):
+		"""Ask the text model for 3-5 slide titles and image prompts. Returns {'slides': [...]} or {'error': message}."""
+		logger.info(f'Planning sales deck for {company}')
+		client = self._client()
+		if client is None:
 			return {'error': "Error: API Key missing."}
 
-		client = genai.Client(api_key=api_key)
-		
 		prompt = f"""
 		You are a senior sales executive for UHF+, a fast-growing Free Ad-Supported TV (FAST) streaming service.
 		Plan a visual sales presentation for {company}, a company in the {industry} industry.
@@ -225,66 +227,103 @@ class UInterface:
 		- Total Video Plays (Last 30 Days): {self.stats['total_plays']:,}
 		- User Growth: {self.stats['growth_rate']}
 		
-		Generate a plan for EXACTLY 5 slides, regardless of the requested length.
+		Plan between 3 and 5 slides, choosing the count from the requested length/depth (5 if it is unclear).
 
 		Format: Return a valid JSON object with the following structure:
 		{{
 			"slides": [
 				{{
 					"title": "Slide Title",
-					"image_prompt": "A detailed prompt for an AI image generator (Imagen 3) to render this specific slide as a high-quality image. Describe the visual style ({style}), the background, and explicitly state the text that must appear on the slide (Title and 1-2 short bullet points). Ask for high contrast and legible text."
+					"image_prompt": "A detailed prompt for an AI image generator to render this specific slide as a high-quality image. Describe the visual style ({style}), the background, and explicitly state the text that must appear on the slide (Title and 1-2 short bullet points). Ask for high contrast and legible text."
 				}}
 			]
 		}}
 		Ensure the JSON is valid. Do not include markdown formatting (like ```json) around the JSON.
 		"""
-		
+
 		try:
 			response = client.models.generate_content(
-				model="gemini-3-flash-preview",
-				contents=[
-					types.Content(
-						role="user",
-						parts=[types.Part.from_text(text=prompt)],
-					),
-				],
+				model=TEXT_MODEL,
+				contents=[types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
+				config=types.GenerateContentConfig(response_mime_type="application/json"),
+			)
+			slides = [s for s in json.loads(response.text).get('slides', []) if s.get('image_prompt')][:5]
+			if not slides:
+				return {'error': "Sorry, Gemini didn't return a usable plan. Please try again."}
+			return {'slides': slides}
+		except Exception as e:
+			logger.error(f"Error planning pitch: {e}")
+			return {'error': "Sorry, I couldn't generate a pitch at this time. Please try again."}
+
+	def generate_slide_image(self, image_prompt):
+		"""Render one slide. Returns a data URI, or None on failure."""
+		client = self._client()
+		if client is None:
+			return None
+		try:
+			response = client.models.generate_content(
+				model=IMAGE_MODEL,
+				contents=[types.Content(role="user", parts=[types.Part.from_text(text=image_prompt)])],
 				config=types.GenerateContentConfig(
-					response_mime_type="application/json",
+					image_config=types.ImageConfig(image_size="1K"),
+					response_modalities=["IMAGE"],
 				)
 			)
-			
-			deck_data = json.loads(response.text)
-			slides = deck_data.get('slides', [])[:5] # Enforce max 5 slides
-			
-			# Generate Images
-			carousel_items = []
-			for i, slide in enumerate(slides):
-				logger.info(f"Generating image for slide {i+1}/{len(slides)}")
-				img_src = self._generate_slide_image(client, slide['image_prompt'])
-				if img_src:
-					carousel_items.append({
-						"key": f"{i}",
-						"src": img_src,
-						"img_style": {"height": "500px", "width": "100%", "object-fit": "contain"}
-					})
-			
-			if not carousel_items:
-				return {'error': "Failed to generate slide images."}
-
-			carousel = dbc.Carousel(
-				items=carousel_items,
-				controls=True,
-				indicators=True,
-				variant="dark"
-			)
-			
-			plaque = self._create_plaque(company, industry, audience, style, length)
-			
-			return {'component': html.Div([carousel, plaque])}
-
+			for part in response.parts or []:
+				if part.inline_data and part.inline_data.data:
+					b64_data = base64.b64encode(part.inline_data.data).decode('utf-8')
+					return f"data:{part.inline_data.mime_type or 'image/png'};base64,{b64_data}"
 		except Exception as e:
-			logger.error(f"Error generating pitch: {e}")
-			return {'error': f"Sorry, I couldn't generate a pitch at this time. Error: {str(e)}"}
+			logger.error(f"Error generating slide image: {e}")
+		return None
+
+	@staticmethod
+	def _slide_signature(deck_id, index, image_prompt):
+		message = f'{deck_id}|{index}|{image_prompt}'.encode()
+		return hmac.new(flask.current_app.secret_key.encode(), message, hashlib.sha256).hexdigest()
+
+	def verify_slide_job(self, job):
+		"""Only render prompts this server planned, so the slide callback can't be used as a free image generator."""
+		try:
+			return hmac.compare_digest(self._slide_signature(job['deck'], job['index'], job['prompt']), job['sig'])
+		except (KeyError, TypeError):
+			return False
+
+	def render_deck(self, plan, company, industry, audience, style, length):
+		"""Deck with a placeholder per slide. Each placeholder's signed job triggers its own render callback, so slides render in parallel and appear as they finish."""
+		deck_id = uuid.uuid4().hex[:12]
+		slides = []
+		for i, slide in enumerate(plan['slides']):
+			job = {'deck': deck_id, 'index': i, 'prompt': slide['image_prompt']}
+			job['sig'] = self._slide_signature(deck_id, i, slide['image_prompt'])
+			slides.append((slide.get('title'), html.Div([
+				html.Div(self.slide_placeholder(i), id={'type': 'sales-slide', 'deck': deck_id, 'index': i}),
+				dcc.Store(id={'type': 'sales-slide-job', 'deck': deck_id, 'index': i}, data=job),
+			])))
+		return html.Div([self.deck_grid(slides), self._create_plaque(company, industry, audience, style, length)])
+
+	def deck_grid(self, slides):
+		"""First slide full width, the rest two per row. Each slide is a (title or None, body) pair."""
+		cols = []
+		for i, (title, body) in enumerate(slides):
+			cols.append(dbc.Col([
+				html.Div(title, className='small fw-bold text-secondary mb-1') if title else None,
+				body,
+			], xs=12, md=12 if i == 0 else 6, className='mb-3'))
+		return dbc.Row(cols)
+
+	def slide_image(self, src):
+		return html.Img(src=src, style={'width': '100%', 'aspect-ratio': '16 / 9', 'object-fit': 'contain', 'border-radius': '0.5rem', 'background-color': 'white'})
+
+	def slide_placeholder(self, index):
+		return self._slide_box([dbc.Spinner(size='sm', color='secondary'), html.Span(f'Rendering slide {index + 1}...', className='text-muted small')])
+
+	def slide_message(self, text):
+		return self._slide_box([html.I(className='bi bi-exclamation-triangle text-warning'), html.Span(text, className='text-muted small')])
+
+	def _slide_box(self, children):
+		return html.Div(children, className='d-flex align-items-center justify-content-center gap-2 p-3 text-center',
+			style={'aspect-ratio': '16 / 9', 'background-color': '#e9ecef', 'border-radius': '0.5rem'})
 
 	def _hex_to_rgb_float(self, hex_color):
 		try:
@@ -292,26 +331,6 @@ class UInterface:
 			return tuple(int(hex_color[i:i+2], 16)/255.0 for i in (0, 2, 4))
 		except:
 			return (0, 0, 0)
-
-	def _generate_slide_image(self, client, image_prompt):
-		try:
-			response = client.models.generate_content(
-				model="gemini-3-pro-image-preview",
-				contents=[types.Content(role="user", parts=[types.Part.from_text(text=image_prompt)])],
-				config=types.GenerateContentConfig(
-					image_config=types.ImageConfig(image_size="1K"),
-					response_modalities=["IMAGE"],
-				)
-			)
-			if response.parts:
-				for part in response.parts:
-					if part.inline_data and part.inline_data.data:
-						b64_data = base64.b64encode(part.inline_data.data).decode('utf-8')
-						mime_type = part.inline_data.mime_type or "image/png"
-						return f"data:{mime_type};base64,{b64_data}"
-		except Exception as e:
-			logger.error(f"Error generating slide image: {e}")
-		return None
 
 	def _upload_to_gcs(self, image_stream):
 		bucket_name = os.environ.get('GCS_BUCKET_NAME')

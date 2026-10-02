@@ -21,18 +21,21 @@ from dash_app.pages.ai import UInterface as ai_ui
 from dash_app.pages.home import UInterface as home_ui
 from dash_app.pages.dashboard import UInterface as dashboard_ui
 from dash_app.pages.sales_enablement import UInterface as sales_ui
+from dash_app import rate_limit
 
 logger = logging.getLogger(__name__)
 
 AI_UI = None
 HOME_UI = None
 DASHBOARD_UI = None
+SALES_UI = None
 
 def register_callbacks(app):
-	global AI_UI, DASHBOARD_UI, HOME_UI
+	global AI_UI, DASHBOARD_UI, HOME_UI, SALES_UI
 	if AI_UI is None: AI_UI = ai_ui()
 	if HOME_UI is None: HOME_UI = home_ui()
 	if DASHBOARD_UI is None:  DASHBOARD_UI  = dashboard_ui()
+	if SALES_UI is None: SALES_UI = sales_ui()
 
 #######################
 # Global
@@ -179,6 +182,9 @@ def register_callbacks(app):
 			if n_clicks != None and n_clicks > 0:
 				image_url = None
 				ui = ai_ui()
+				retry_after = rate_limit.check('design_image')
+				if retry_after:
+					return ui.show_alert(rate_limit.limit_message('design_image', retry_after))
 				try:
 					image_url = ui.ai_generate_image(input_prompt, style='anime')
 				except Exception as e:
@@ -207,6 +213,12 @@ def register_callbacks(app):
 				o = None
 				colors = []
 				ui = ai_ui()
+				retry_after = rate_limit.check('design_theme')
+				if retry_after:
+					return dbc.Stack([
+						ui.show_alert(rate_limit.limit_message('design_theme', retry_after)),
+						dashboard_ui().render_summary_charts(w=750,h=400,chart_only=True),
+					],gap=3)
 				try:
 					colors = ui.ai_color_sequence(input_prompt)
 					o = dashboard_ui().render_summary_charts(w=750,h=400,chart_only=True,colors=colors)
@@ -226,30 +238,43 @@ def register_callbacks(app):
 		 
 	@app.callback(
 		Output('sales-pitch-output', 'children'),
-		Output('sales-download-deck', 'data'),
 		Input('sales-pitch-submit', 'n_clicks'),
 		State('sales-input-company', 'value'),
 		State('sales-input-industry', 'value'),
 		State('sales-input-audience', 'value'),
 		State('sales-input-style', 'value'),
 		State('sales-input-length', 'value'),
+		running=[(Output('sales-pitch-submit', 'disabled'), True, False)],
 		prevent_initial_call=True,
 	)
-	def sales_generate_deck(n_clicks, company, industry, audience, style, length):
-		logger.info(f'[{datetime.now()}] | [sales_generate_deck] | trig_id: [{dash.ctx.triggered_id}]')
+	def sales_plan_deck(n_clicks, company, industry, audience, style, length):
+		logger.info(f'[{datetime.now()}] | [sales_plan_deck] | trig_id: [{dash.ctx.triggered_id}]')
 		if not n_clicks:
 			raise PreventUpdate
-		
-		ui = sales_ui()
-		result = ui.ai_generate_deck(company, industry, audience, style, length)
-		
-		if 'error' in result:
-			return dcc.Markdown(result['error']), None
-		
-		if 'component' in result:
-			return result['component'], None
-			
-		return dcc.Markdown("Error: No content generated."), None
+		retry_after = rate_limit.check('sales_deck')
+		if retry_after:
+			return [SALES_UI.show_alert(rate_limit.limit_message('sales_deck', retry_after)), SALES_UI.example_deck]
+		plan = SALES_UI.plan_deck(company, industry, audience, style, length)
+		if 'error' in plan:
+			return dcc.Markdown(plan['error'])
+		return SALES_UI.render_deck(plan, company, industry, audience, style, length)
+
+	# Fires once per slide placeholder as soon as the deck renders; the browser sends these in parallel
+	@app.callback(
+		Output({'type': 'sales-slide', 'deck': MATCH, 'index': MATCH}, 'children'),
+		Input({'type': 'sales-slide-job', 'deck': MATCH, 'index': MATCH}, 'data'),
+		prevent_initial_call=False,
+	)
+	def sales_render_slide(job):
+		if not job or not SALES_UI.verify_slide_job(job):
+			raise PreventUpdate
+		retry_after = rate_limit.check('sales_slide')
+		if retry_after:
+			return SALES_UI.slide_message(rate_limit.limit_message('sales_slide', retry_after))
+		src = SALES_UI.generate_slide_image(job['prompt'])
+		if not src:
+			return SALES_UI.slide_message("Couldn't render this slide. Generate the deck again to retry.")
+		return SALES_UI.slide_image(src)
 
 	@app.callback(
 		Output("sales-onboarding-modal", "is_open"),

@@ -37,9 +37,10 @@ This file contains context and architectural notes for the `personal-portfolio` 
     *   Dash callbacks are primarily registered here to keep page logic clean.
     *   It imports the UI classes from `pages/` to access component IDs.
 
-5.  **Long-running AI callbacks run inside the request:**
-    *   There is no task queue. Slow Gemini calls (~3.5 min observed for the sales deck) run as regular Dash callbacks with `running=` spinners.
-    *   Cloud Run's request timeout (600s, Terraform) and gunicorn's `--timeout` (app/Dockerfile) must stay at least as long as the slowest callback.
+5.  **AI callbacks run inside the request, one Gemini call each:**
+    *   There is no task queue. The sales deck is planned by one callback (`gemini-3.8-flash`), which renders a placeholder per slide carrying an HMAC-signed job; a `MATCH` callback per slide renders it (`gemini-3.1-flash-image`). The browser fires those in parallel, so slides appear as they finish (~20s for a whole deck). The signature stops the slide callback from rendering arbitrary prompts.
+    *   Cloud Run's request timeout (120s, Terraform) and gunicorn's `--timeout` (app/Dockerfile) must stay at least as long as one Gemini call.
+    *   `dash_app/rate_limit.py` caps each visitor (last `X-Forwarded-For` entry, which Cloud Run sets) per 24h: 5 decks, 30 slide renders, 30 themes, 10 images. Counts are in memory, so gunicorn runs one worker.
 
 ## Content & Features
 

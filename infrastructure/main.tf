@@ -245,9 +245,9 @@ resource "google_cloud_run_v2_service" "app" {
 
   template {
     service_account = google_service_account.app_runtime.email
-    # AI demo callbacks run inside the request; matches gunicorn's --timeout in app/Dockerfile
-    timeout                          = "600s"
-    max_instance_request_concurrency = 16 # gunicorn: 2 workers x 8 threads
+    # Each AI demo request is a single Gemini call; matches gunicorn's --timeout in app/Dockerfile
+    timeout                          = "120s"
+    max_instance_request_concurrency = 16 # gunicorn: 1 worker x 16 threads
 
     scaling {
       # One warm instance so the first visitor never waits for a ~20s cold start
