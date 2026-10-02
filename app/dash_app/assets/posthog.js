@@ -3,7 +3,7 @@
 // persistence 'memory' sets no cookies or local storage, so no consent banner is needed; the trade-off is
 // that a full page reload counts as a new visitor. The project key is public by design.
 (function () {
-    var POSTHOG_KEY = '';
+    var POSTHOG_KEY = 'phc_stmJyehFrc5GfpWzY2tXvd3GNYLds4muCSDAHoEZrRrT';  // PostHog project "Portfolio" (640999)
     var POSTHOG_HOST = 'https://us.i.posthog.com';
     if (!POSTHOG_KEY || window.location.hostname !== 'portfolio.nickearl.net') return;
 
