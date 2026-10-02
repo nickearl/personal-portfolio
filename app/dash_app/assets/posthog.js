@@ -5,7 +5,9 @@
 // consent banner is needed; a full page reload counts as a new visitor. The project key is public by design.
 (function () {
     var POSTHOG_KEY = 'phc_oR4CVu23N3x93JWYhevazEsyP4NihZwG5Pbggvt2LwPq';  // PostHog org "Portfolio", project "Portfolio" (642218)
-    var POSTHOG_HOST = 'https://us.i.posthog.com';
+    // PostHog managed reverse proxy (CNAME to PostHog, US cloud): first-party domain, so ad blockers
+    // that block *.posthog.com don't drop the site's analytics. ui_host keeps PostHog app links working.
+    var POSTHOG_HOST = 'https://metrics.nickearl.net';
     if (!POSTHOG_KEY || window.location.hostname !== 'portfolio.nickearl.net') return;
 
     // Official loader snippet (posthog.com/docs/libraries/js)
@@ -13,6 +15,7 @@
 
     posthog.init(POSTHOG_KEY, {
         api_host: POSTHOG_HOST,
+        ui_host: 'https://us.posthog.com',
         defaults: '2026-05-30',          // includes history-based pageviews for single-page apps
         persistence: 'memory',
         person_profiles: 'identified_only',
