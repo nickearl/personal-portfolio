@@ -23,6 +23,8 @@ from dash_app.utils import load_secret
 # Get environment variables
 load_dotenv(find_dotenv())
 PAGE = 'ai'
+TEXT_MODEL = 'gemini-3.8-flash'
+IMAGE_MODEL = 'gemini-3.1-flash-image'
 pd.set_option('future.no_silent_downcasting', True)
 
 logger = logging.getLogger(__name__)
@@ -266,7 +268,7 @@ class UInterface:
 		
 		try:
 			response = client.models.generate_content(
-				model="gemini-3-flash-preview",
+				model=TEXT_MODEL,
 				contents=[
 					types.Content(
 						role="user",
@@ -347,7 +349,7 @@ class UInterface:
 		
 		try:
 			response = client.models.generate_content(
-				model="gemini-3-pro-image-preview",
+				model=IMAGE_MODEL,
 				contents=[
 					types.Content(
 						role="user",

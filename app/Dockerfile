@@ -26,6 +26,7 @@ con.execute("INSTALL httpfs;")
 con.close()
 PY
 
-# AI demo callbacks run inside the request (no task queue), so the timeout must cover the
-# slowest one: the sales deck makes up to 6 sequential Gemini calls (~3.5 min observed). Cloud Run's request timeout matches.
-CMD exec gunicorn app:server -b 0.0.0.0:${PORT} --workers 2 --threads 8 --timeout 600
+# One worker so each instance keeps a single set of per-visitor rate-limit counts (dash_app/rate_limit.py);
+# the AI callbacks mostly wait on Gemini, so threads cover concurrency (matches Cloud Run's 16 per instance).
+# Each AI request is a single Gemini call (~10s); Cloud Run's request timeout matches.
+CMD exec gunicorn app:server -b 0.0.0.0:${PORT} --workers 1 --threads 16 --timeout 120
