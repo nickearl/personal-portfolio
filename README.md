@@ -99,6 +99,6 @@ Push to `main`. The workflow builds the image, pushes it to Artifact Registry, a
 
 ## Analytics, SEO & Link Previews
 
-*   **Analytics:** `app/dash_app/assets/posthog.js` loads PostHog on `portfolio.nickearl.net` only, without cookies. Set `POSTHOG_KEY` there; it does nothing while empty.
+*   **Analytics:** `app/dash_app/assets/posthog.js` loads PostHog on `portfolio.nickearl.net` only, without cookies. Events go to the PostHog project "Portfolio" (US cloud).
 *   **SEO:** `/robots.txt` and `/sitemap.xml` are served by `app.py` from the enabled pages.
 *   **Link previews:** each page's `share_description` in `conf.py` and its card in `assets/images/share/` feed the description and `og:image` tags.
