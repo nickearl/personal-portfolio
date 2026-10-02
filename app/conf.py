@@ -409,19 +409,23 @@ class GlobalUInterface:
 				'icon': 'bi-house-door-fill',
 				'display_name': 'Home',
 				'summary_header': 'Home Header',
+				# Link preview / meta description (keep under ~160 chars)
+				'share_description': "I don't build dashboards. I build the systems that make them obsolete. Try the live AI agents, BI and generative AI demos.",
 				'summary_text': """
 							- Explore the various tools and insights available in this app.
 
 						""",
-				'image': 'assets/images/pixel_nick_synthwave_cropped_lo_res.png',
+				'image': 'assets/images/pixel_nick_synthwave_cropped_lo_res.webp',
 				'enabled': True,
 			},
 			'dashboard': {
 				'prefix': 'dash',
 				'icon': 'bi-bar-chart-line-fill',
-				'image': 'assets/images/dashboard_screenshot.png',
+				'image': 'assets/images/dashboard_screenshot.webp',
 				'display_name': 'Interactive Data Visualization',
 				'summary_header': 'An interactive demo dashboard for a fictional new streaming service',
+				# Link preview / meta description (keep under ~160 chars)
+				'share_description': 'An interactive BI dashboard for a fictional streaming service, built on procedurally generated viewing data.',
 				'summary_text': """
 					- BI & data visualization best practices
 					- Stakeholder guidance
@@ -433,9 +437,11 @@ class GlobalUInterface:
 			'sales_enablement': {
 				'prefix': 'sales',
 				'icon': 'bi-graph-up-arrow',
-				'image': 'assets/images/sales_enablement.png',
+				'image': 'assets/images/sales_enablement.webp',
 				'display_name': 'Sales Enablement',
 				'summary_header': 'AI-Powered Sales Tools',
+				# Link preview / meta description (keep under ~160 chars)
+				'share_description': 'Name a prospect and get a pitch deck back. Gemini plans the slides from platform data and renders each one in seconds.',
 				'summary_text': """
 					- **Smart Slide Deck Generator**: Generate data-driven sales presentation outlines customized for specific prospects and audiences.
 				""",
@@ -444,9 +450,11 @@ class GlobalUInterface:
 			'ai': {
 				'prefix': 'ai',
 				'icon': 'bi-stars',
-				'image': 'assets/images/cyberbrain.png',
+				'image': 'assets/images/cyberbrain.webp',
 				'display_name': 'Design Lab',
 				'summary_header': 'AI-Powered Design & Asset Generation',
+				# Link preview / meta description (keep under ~160 chars)
+				'share_description': 'Describe a mood and watch the charts recolor, or generate artwork in a fixed house style. A small lab for AI-driven design.',
 				'summary_text': """
 					- **Theme Generator**  
 					Generate data-driven color palettes and dashboard themes from natural language descriptions.
@@ -497,31 +505,29 @@ class GlobalUInterface:
 			], className='sidebar shadow-sm'),
 			'navbar': dbc.Navbar([
 				dbc.Container([
-					dbc.NavbarBrand(DISPLAY_NAME, className='me-auto fw-bold', style={'font-size': '1.25rem', 'color': '#2c3e50'}),
+					# Menu button and short title replace the fixed sidebar below the lg breakpoint (styles.css)
+					html.Button(html.I(className='bi bi-list'), id='nav-toggle', n_clicks=0, className='nav-toggle', title='Menu', **{'aria-label': 'Open menu'}),
+					dbc.NavbarBrand([
+						html.Span(DISPLAY_NAME, className='d-none d-lg-inline'),
+						html.Span('Nick Earl Portfolio', className='d-lg-none'),
+					], href=f'/{BASE_PATH}/', className='me-auto fw-bold navbar-title'),
 					html.Img(src=self.logo_paths['light'], height='32px'),
-				], fluid=True)
+				], fluid=True, className='flex-nowrap')
 			], color='white', sticky='top', className='border-bottom py-2', style={'z-index': '1020'}),
+			'mobile_nav': dbc.Offcanvas(
+				dbc.Nav(self._build_nav_links(), vertical=True, pills=True, className='sidebar-nav'),
+				id='offcanvas-sidebar',
+				title=html.Img(src=self.logo_paths['light'], className='sidebar-logo'),
+				is_open=False,
+				placement='start',
+				className='mobile-nav',
+			),
 			'footer': dbc.Stack([
 				html.Span(f'Nick Earl © {datetime.now().year}', className='footer-text'),
 				html.A([html.I(className='bi bi-linkedin me-2'), 'linkedin.com/in/nickearl'],href='https://www.linkedin.com/in/nickearl/',className='footer-text'),
 				html.A([html.I(className='bi bi-github me-2'), 'github.com/nickearl'],href='https://github.com/nickearl',className='footer-text'),
 				html.A([html.I(className='bi bi-globe me-2'), 'nickearl.net'],href='https://www.nickearl.net',className='footer-text'),
-			],direction='horizontal',gap=3, className='footer d-flex justify-content-center align-items-center'),
-			'loading_modal': dbc.Modal([
-			dbc.Card([
-				dbc.CardHeader([
-					dbc.Progress(id='loading-modal-bar',value=0, striped=True, animated=True, color='#86D7DC',style={'background-color':'#3A434B'}),
-					html.H3(['Loading...'],id='loading-modal-text',style={'color':'white'}),
-					dbc.ListGroup([],id='loading-modal-list'),
-				]),
-				dbc.CardBody([
-					html.Img(src='assets/images/loading_loop.gif',style={'width':'100%','height':'auto'}),
-					dbc.ListGroup([],id='loading-modal-average-duration'),
-				]),
-			],className='loading-card'),
-			dcc.Store(id='loading-modal-data'),
-			dcc.Interval(id='loading-modal-refresh-interval', interval=1 * 1000, n_intervals=0)
-		],is_open=False,backdrop='static',keyboard=False,className='loading-modal',id='loading-modal'),
+			],direction='horizontal',gap=3, className='footer d-flex flex-wrap justify-content-center align-items-center'),
 		}
 		self.styles = {
 			'card': {
@@ -549,16 +555,14 @@ class GlobalUInterface:
 	def render_global_wrapper(self, flask_session: SessionMixin)-> dbc.Container:
 		return dbc.Container([
 			self.layout['sidebar'],
+			self.layout['mobile_nav'],
 			html.Div([
 				self.layout['navbar'],
 				dash.page_container,
-				self.layout['loading_modal'],
 				self.layout['footer'],
 				html.Div([],id='dev-null'),
 			], className='content-wrapper'),
 			dcc.Store(id='session-id-store', data=flask_session.get('session_id')),
-			dcc.Store(id='download-results-store'),
-			dcc.Download(id='download-results-downloader'),
 		], fluid=True, className='p-0')
 
 	def render_fail_card(self,

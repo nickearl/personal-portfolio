@@ -163,10 +163,6 @@ resource "random_password" "flask_secret_key" {
   special = false
 }
 
-resource "random_id" "flask_encryption_key" {
-  byte_length = 32
-}
-
 resource "google_secret_manager_secret" "flask_secret_key" {
   secret_id = "${var.service_name}-flask-secret-key"
   replication {
@@ -178,19 +174,6 @@ resource "google_secret_manager_secret" "flask_secret_key" {
 resource "google_secret_manager_secret_version" "flask_secret_key" {
   secret      = google_secret_manager_secret.flask_secret_key.id
   secret_data = random_password.flask_secret_key.result
-}
-
-resource "google_secret_manager_secret" "flask_encryption_key" {
-  secret_id = "${var.service_name}-flask-encryption-key"
-  replication {
-    auto {}
-  }
-  depends_on = [google_project_service.services]
-}
-
-resource "google_secret_manager_secret_version" "flask_encryption_key" {
-  secret      = google_secret_manager_secret.flask_encryption_key.id
-  secret_data = random_id.flask_encryption_key.b64_url
 }
 
 # Dedicated Gemini key so the portfolio's usage and quota stay separate from other projects
@@ -229,9 +212,8 @@ resource "google_service_account" "app_runtime" {
 
 resource "google_secret_manager_secret_iam_member" "app_secret_access" {
   for_each = {
-    flask_secret_key     = google_secret_manager_secret.flask_secret_key.secret_id
-    flask_encryption_key = google_secret_manager_secret.flask_encryption_key.secret_id
-    gemini_api_key       = google_secret_manager_secret.gemini_api_key.secret_id
+    flask_secret_key = google_secret_manager_secret.flask_secret_key.secret_id
+    gemini_api_key   = google_secret_manager_secret.gemini_api_key.secret_id
   }
   secret_id = each.value
   role      = "roles/secretmanager.secretAccessor"
@@ -281,23 +263,10 @@ resource "google_cloud_run_v2_service" "app" {
         value = var.service_name
       }
       env {
-        name  = "ENABLE_GOOGLE_AUTH"
-        value = "false"
-      }
-      env {
         name = "FLASK_SECRET_KEY"
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.flask_secret_key.secret_id
-            version = "latest"
-          }
-        }
-      }
-      env {
-        name = "FLASK_ENCRYPTION_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.flask_encryption_key.secret_id
             version = "latest"
           }
         }
@@ -335,7 +304,6 @@ resource "google_cloud_run_v2_service" "app" {
     google_project_service.services,
     google_secret_manager_secret_iam_member.app_secret_access,
     google_secret_manager_secret_version.flask_secret_key,
-    google_secret_manager_secret_version.flask_encryption_key,
     google_secret_manager_secret_version.gemini_api_key,
   ]
 }

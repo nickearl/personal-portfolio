@@ -6,34 +6,41 @@ Built using **Flask** as the web framework and **Plotly Dash** for interactive a
 
 ## Features
 
-*   **Interactive Portfolio:** A data-driven resume and portfolio section parsed dynamically from JSON.
+*   **AI Agents:** Voice and chat agents (ElevenLabs), including a virtual-interview clone trained on a structured career dataset.
 *   **BI Dashboard Demo:** A fully interactive executive dashboard demonstrating advanced filtering, cross-filtering, and dynamic aggregation using Pandas and Plotly.
 *   **AI Design Lab:**
     *   **Theme Generator:** Uses Gemini/LLMs to generate color palettes and CSS themes from natural language prompts.
     *   **Asset Generator:** Creates consistent visual assets on the fly.
-*   **Sales Enablement Tool:** An AI-powered agent that generates tailored sales presentation outlines and slide content based on prospect data.
+*   **Sales Enablement Tool:** Plans a 3-5 slide pitch deck from platform data, then renders every slide in parallel so they appear as they finish (about 15 seconds for a whole deck).
 *   **Enterprise-Grade Architecture:**
     *   **Hybrid Flask/Dash:** Seamless integration of standard web routes with reactive Dash apps.
     *   **Serverless Hosting:** Runs on Cloud Run with a warm instance for instant first loads, autoscaling under load, and Google-managed TLS on the custom domain.
     *   **Keyless CI/CD:** GitHub Actions deploys via Workload Identity Federation, with no long-lived credentials; all infrastructure is Terraform.
-    *   **Security:** Google OAuth 2.0 authentication with role-based access control (RBAC).
+    *   **Abuse Protection:** Per-visitor daily caps on the AI demos, and server-signed slide jobs so the image renderer only renders prompts the app planned.
 
 ## Tech Stack
 
 *   **Core:** Python 3.13, Flask, Plotly Dash
-*   **Data:** Pandas, DuckDB
-*   **AI/LLM:** OpenAI API, Google Gemini
+*   **Data:** Pandas, Plotly, AG Grid
+*   **AI/LLM:** Google Gemini (`gemini-3.8-flash`, `gemini-3.1-flash-image`), ElevenLabs agents
+*   **Analytics:** PostHog (cookieless)
 *   **Infrastructure:** Docker, Terraform, Google Cloud Run
 *   **Package Management:** uv
 
 ## Project Structure
 
 ```text
-base-insights-app/
+personal-portfolio/
 ├── app/
-│   ├── app.py                  # Main Flask entry point
-│   ├── auth.py                 # Google OAuth & session logic
-│   ├── conf.py                 # Global UI configuration & page definitions
+│   ├── app.py                  # Flask server, Dash app, robots/sitemap routes
+│   ├── conf.py                 # Global layout & page definitions (incl. link-preview descriptions)
+│   └── dash_app/
+│       ├── callbacks.py        # All Dash callbacks
+│       ├── rate_limit.py       # Per-visitor caps on the AI demos
+│       ├── pages/              # One module per page
+│       └── assets/             # CSS, posthog.js, images (share/ holds the 1200x630 link-preview cards)
+├── infrastructure/             # Terraform: Cloud Run, secrets, domain, DNS, monitoring, CI identity
+└── bootstrap.sh                # terraform init + apply wrapper
 ```
 
 ## ⚡ Local Development
@@ -47,7 +54,7 @@ base-insights-app/
 
 ```bash
 git clone <repository-url>
-cd base-insights-app
+cd personal-portfolio
 uv sync  # Installs dependencies from uv.lock
 ```
 
@@ -56,15 +63,9 @@ uv sync  # Installs dependencies from uv.lock
 Create a `.env` file in the repository root directory with the following keys:
 
 ```ini
-DEPLOY_ENV=dev
 FLASK_SECRET_KEY=<your-secret-key>
-FLASK_ENCRYPTION_KEY=<fernet-key>
 GEMINI_API_KEY=<gemini-api-key>
-SERVER_NAME=Personal Portfolio
-DISPLAY_NAME=Personal Portfolio
-ENABLE_GOOGLE_AUTH=true # or false for local dev without auth
-GOOGLE_OAUTH_CLIENT_ID=<client-id>
-GOOGLE_OAUTH_CLIENT_SECRET=<client-secret>
+SERVER_NAME=personal-portfolio
 ```
 
 ### 3. Running the App
@@ -86,7 +87,7 @@ Infrastructure is managed by **Terraform** (`infrastructure/`); application code
 ./bootstrap.sh plan     # any terraform subcommand works
 ```
 
-This manages the Cloud Run service, its runtime service account and secrets (Flask keys and a dedicated Gemini API key in Secret Manager), Artifact Registry, the custom domain mapping and Cloudflare DNS record, and the Workload Identity Federation pool GitHub Actions uses. It also writes the GitHub Actions secrets and variables the workflow needs. The script reads the Cloudflare token from Secret Manager and authenticates the GitHub provider with `gh auth token`.
+This manages the Cloud Run service, its runtime service account and secrets (the Flask secret key and a dedicated Gemini API key in Secret Manager), Artifact Registry, the custom domain mapping and Cloudflare DNS record, and the Workload Identity Federation pool GitHub Actions uses. It also writes the GitHub Actions secrets and variables the workflow needs. The script reads the Cloudflare token from Secret Manager and authenticates the GitHub provider with `gh auth token`.
 
 ### 2. Deploy Application
 
@@ -96,9 +97,8 @@ Push to `main`. The workflow builds the image, pushes it to Artifact Registry, a
 
 `cloudflare_record.app_dns` is a DNS-only (unproxied) CNAME to `ghs.googlehosted.com`. Google issues and renews the certificate for the domain mapping automatically. The record must stay unproxied or certificate issuance fails.
 
-## Authentication & Access
+## Analytics, SEO & Link Previews
 
-*   **Google Auth:** Managed in `app/auth.py`.
-*   **Access Control:**
-    *   **Groups:** Permissions are defined in `app/conf.py` using `permission_groups` which map internal departments (from `internal_employees`) to roles (e.g., `EXECUTIVE`, `FIELD_LEADERSHIP`).
-    *   **Page Access:** Each page in `conf.py` defines which `access_groups` are allowed to view it.
+*   **Analytics:** `app/dash_app/assets/posthog.js` loads PostHog on `portfolio.nickearl.net` only, without cookies. Set `POSTHOG_KEY` there; it does nothing while empty.
+*   **SEO:** `/robots.txt` and `/sitemap.xml` are served by `app.py` from the enabled pages.
+*   **Link previews:** each page's `share_description` in `conf.py` and its card in `assets/images/share/` feed the description and `og:image` tags.

@@ -76,7 +76,7 @@ class UInterface:
 					dcc.Dropdown(options=video_categories,placeholder='Video Category',id='filter-video-category',className='filter-dropdown',multi=True),
 					dcc.Dropdown(options=video_titles,placeholder='Video Title',id='filter-video-title',className='filter-dropdown',multi=True),
 					dcc.Dropdown(options=[x+1 for x in range(10)],placeholder='Num Chart Items',id='filter-num-chart-items',className='filter-dropdown'),
-				],direction='horizontal',gap=3,className='d-flex align-items-center justify-content-center'),
+				],direction='horizontal',gap=3,className='d-flex flex-wrap row-gap-2 align-items-center justify-content-center'),
 			],fluid=True),
 			'loading_modal': dbc.Modal([
 				dbc.Card([
@@ -91,7 +91,7 @@ class UInterface:
 				],className='loading-card'),
 			],is_open=False,className='loading-modal',id='loading-modal'),
 			'header': dbc.Stack([
-				html.Img(src='assets/images/uhf_logo.png',style={'width':'160px','height':'100px'}),
+				html.Img(src='assets/images/uhf_logo.webp',style={'width':'160px','height':'100px'}),
 				html.H3(['UHF+ | Key Stats']),
 				html.Div([
 					html.Span(
@@ -169,7 +169,7 @@ class UInterface:
 				overlay_style={'visibility':'visible', 'filter': 'blur(2px)'},
 				custom_spinner=self.layout['loading_modal']
 			)	
-		],direction='horizontal',gap=3,className='header d-flex justify-content-center align-items-center')
+		],direction='horizontal',gap=3,className='header dashboard-tabs d-flex justify-content-center align-items-center')
 
 	def get_quote(self):
 		pathname = self.base_dir / 'assets' / 'data' / 'quotes.csv'
@@ -209,14 +209,6 @@ class UInterface:
 		],className='quote-card')
 
 		return card
-
-	def get_random_song(self):
-		pathname = self.base_dir / 'assets' / 'data' / 'taylor_swift_songs.csv'
-		with open(pathname) as g:
-			df = pd.read_csv(g, sep=",", header=0)
-		r = random.randrange(len(df.index))
-		q = df.iloc[r]
-		return q
 
 	def render_daily_grid(self, configs=None):
 		logger.info('rendering daily grid')
@@ -289,6 +281,8 @@ class UInterface:
 				'tooltipHideDelay': 1000
 			 },
 			columnSize = 'autoSize',
+			# autoSize runs while the tab is hidden and measures 0; keep columns readable
+			defaultColDef={'minWidth': 110},
 		)
 		grid = dbc.Stack([
 			grid,
@@ -402,7 +396,7 @@ class UInterface:
 			uniformtext_minsize=10,
 			uniformtext_mode='hide',
 			template='plotly_white',
-			width=w,
+			autosize=True,  # fill the container (fixed widths overflowed phones and tablets)
 			height=h,
 			hoverlabel=dict(
 				bgcolor='#ecf0f1',
@@ -434,7 +428,7 @@ class UInterface:
 			uniformtext_minsize=10,
 			uniformtext_mode='hide',
 			template='plotly_white',
-			width=w,
+			autosize=True,  # fill the container (fixed widths overflowed phones and tablets)
 			height=h,
 			hoverlabel=dict(
 				bgcolor='#ecf0f1',
@@ -482,7 +476,7 @@ class UInterface:
 			uniformtext_minsize=10,
 			uniformtext_mode='hide',
 			template='plotly_white',
-			width=w,
+			autosize=True,  # fill the container (fixed widths overflowed phones and tablets)
 			height=h * 2,
 			hoverlabel=dict(
 				bgcolor='#ecf0f1',
@@ -656,7 +650,7 @@ class UInterface:
 			# uniformtext_minsize=8,
 			# uniformtext_mode='show',
 			template='plotly_white',
-			width=w,
+			autosize=True,  # fill the container (fixed widths overflowed phones and tablets)
 			height=h,
 			hoverlabel=dict(
 				bgcolor='#ecf0f1',
@@ -712,7 +706,7 @@ class UInterface:
 		engagement_fig.update_layout(
 			title_text=f'Engagement By Show',
 			template='plotly_white',
-			width=w *.65,
+			autosize=True,  # fill the container (fixed widths overflowed phones and tablets)
 			height=h *.9,
 			hoverlabel=dict(
 				bgcolor='#ecf0f1',
@@ -906,7 +900,7 @@ class UInterface:
 		line_chart_fig.update_layout(
 			title_text=f'Topline Traffic by Date',
 			template='plotly_white',
-			width=w,
+			autosize=True,  # fill the container (fixed widths overflowed phones and tablets)
 			height=h,
 			barmode='group',
 			bargap=0.1,

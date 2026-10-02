@@ -663,3 +663,138 @@ blockquote {
     opacity: 1;
     transform: scale(1.05);
 }
+/* --------------------------------------------------------- */
+/* Responsive: below lg the fixed sidebar becomes a menu     */
+/* (#nav-toggle + offcanvas); below md two-column layouts    */
+/* marked .stack-mobile stack vertically                     */
+/* --------------------------------------------------------- */
+.nav-toggle {
+    display: none;
+    border: 0;
+    background: none;
+    padding: 0 .75rem 0 0;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: #2c3e50;
+}
+.navbar-title {
+    font-size: 1.25rem;
+    color: #2c3e50 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+.mobile-nav {
+    max-width: 80vw;
+}
+
+@media (min-width: 768px) {
+    .sales-form-col {
+        border-right: 1px solid #eee;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        display: none;
+    }
+    .content-wrapper {
+        margin-left: 0;
+    }
+    .nav-toggle {
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .stack-mobile {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .stack-mobile > * {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .panel-button {
+        width: 100% !important;
+    }
+    .header {
+        flex-direction: column !important;
+        text-align: center;
+        padding: 1rem;
+    }
+    .header > * {
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    .intro-text {
+        padding: 1rem;
+    }
+    .intro-image {
+        max-width: 280px;
+        padding: 1rem;
+        margin: 0 auto;
+    }
+    .intro-link {
+        width: auto;
+        padding-left: 0;
+    }
+    .employer-logo {
+        max-height: 36px;
+        max-width: 110px;
+    }
+    #article-carousel {
+        height: 460px !important;
+    }
+    .carousel-image {
+        width: 100%;
+        height: auto;
+    }
+    .carousel-link {
+        width: auto;
+        padding-left: 0;
+        font-size: 1rem;
+    }
+    /* Nested padded cards left the AI agent widget ~240px wide; it needs ~300px.
+       Shrink Bootstrap's gutter so container padding and row margins stay matched */
+    .content-wrapper .container-fluid,
+    .content-wrapper .row {
+        --bs-gutter-x: .5rem;
+    }
+    .panel-body {
+        padding: .25rem;
+    }
+    .panel-button .card-body {
+        padding: 0;
+    }
+    .footer-text {
+        font-size: .95rem;
+    }
+}
+
+/* Charts autosize to their container: items in any row holding a chart share it equally
+   (charts are often wrapped in their own stacks), and those rows stack below lg */
+.dash-graph {
+    width: 100%;
+    min-width: 0;
+}
+.hstack:has(.dash-graph) > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+@media (max-width: 991.98px) {
+    .hstack:has(.dash-graph) {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+}
+
+/* Charts no longer have fixed widths, so give the dashboard's tab area its width explicitly */
+.dashboard-tabs > * {
+    width: 100%;
+    max-width: 1100px;
+}
