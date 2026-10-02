@@ -798,3 +798,120 @@ blockquote {
     width: 100%;
     max-width: 1100px;
 }
+
+/* --------------------------------------------------------- */
+/* Deck slides open in a lightbox (assets/lightbox.js)        */
+/* --------------------------------------------------------- */
+.deck-slide {
+    cursor: zoom-in;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.deck-slide:hover {
+    transform: scale(1.015);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+}
+.deck-slide:focus-visible {
+    outline: 3px solid #86D7DC;
+    outline-offset: 2px;
+}
+body.lightbox-lock {
+    overflow: hidden;
+}
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 5rem;
+    background-color: rgba(12, 12, 24, .92);
+}
+.lightbox.open {
+    display: flex;
+}
+.lightbox-figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+    max-height: 100%;
+}
+.lightbox-img {
+    max-width: 100%;
+    max-height: calc(100vh - 10rem);
+    object-fit: contain;
+    border-radius: .5rem;
+    background-color: white;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
+}
+.lightbox figcaption {
+    display: flex;
+    gap: 1rem;
+    margin-top: .9rem;
+    color: #eee;
+    font-size: 1rem;
+    text-align: center;
+}
+.lightbox-counter {
+    color: #aaa;
+    white-space: nowrap;
+}
+.lightbox-btn {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0 0 .2rem;
+    border: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, .14);
+    color: white;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.lightbox-btn:hover,
+.lightbox-btn:focus-visible {
+    background-color: rgba(255, 255, 255, .3);
+    outline: none;
+}
+.lightbox-btn[hidden] {
+    display: none;
+}
+.lightbox-close {
+    top: 1rem;
+    right: 1rem;
+}
+.lightbox-prev,
+.lightbox-next {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.lightbox-prev {
+    left: 1rem;
+}
+.lightbox-next {
+    right: 1rem;
+}
+@media (max-width: 767.98px) {
+    /* Arrows move below the slide so they don't cover it; swiping also works */
+    .lightbox {
+        padding: 4rem .5rem 5.5rem;
+    }
+    .lightbox-prev,
+    .lightbox-next {
+        top: auto;
+        bottom: 1.25rem;
+        transform: none;
+    }
+    .lightbox-prev {
+        left: calc(50% - 4rem);
+    }
+    .lightbox-next {
+        right: calc(50% - 4rem);
+    }
+}

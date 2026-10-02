@@ -212,7 +212,7 @@ def register_callbacks(app):
 		src = SALES_UI.generate_slide_image(job['prompt'])
 		if not src:
 			return SALES_UI.slide_message("Couldn't render this slide. Generate the deck again to retry.")
-		return SALES_UI.slide_image(src)
+		return SALES_UI.slide_image(src, job.get('title', ''))
 
 	@app.callback(
 		Output("sales-onboarding-modal", "is_open"),
