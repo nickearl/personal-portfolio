@@ -48,7 +48,7 @@ class UInterface:
 		self.layout = {
 			'header': dbc.Stack([
 				dbc.Stack([
-					# html.Img(src='assets/images/robot_and_human.png',style={'width':'150px','height':'150px'}),
+					# html.Img(src='assets/images/robot_and_human.webp',style={'width':'150px','height':'150px'}),
 					html.Img(src=self.conf['image'],style={'width':'150px','height':'150px'}),
 					html.H3(self.conf['display_name']),
 				],direction='horizontal',gap=3,className='justify-content-end',style={'width':'50%','max-width':'500px'}),
@@ -67,7 +67,7 @@ class UInterface:
 										3. Send the payload to the LLM
 										4. Parse response from AI, for example a list of records to insert into a dataframe, or a list of color hex codes.
 									"""),
-									html.Img(src='assets/images/ai_screenshot.png', style={'max-width':'65vw'}),
+									html.Img(src='assets/images/ai_screenshot.webp', style={'max-width':'65vw'}),
 									html.Span([
 										'You can ',
 										html.A('view the source code in my Github repo',href='https://github.com/nickearl/bi-demo',target='_blank',style={'font-weight':'bold'}),
@@ -235,7 +235,7 @@ class UInterface:
 									id='ai-image-loading',
 									children=[
 										html.Div(
-											html.Img(src='assets/images/placeholder.png', id='ai-image-output', style={'width':'100%', 'max-height':'500px', 'object-fit':'contain', 'border-radius':'0.5rem'}),
+											html.Img(src='assets/images/placeholder.webp', id='ai-image-output', style={'width':'100%', 'max-height':'500px', 'object-fit':'contain', 'border-radius':'0.5rem'}),
 											id='ai-image-container',
 											className='d-flex justify-content-center align-items-center bg-light rounded p-3',
 											style={'min-height':'400px'}
@@ -372,10 +372,10 @@ class UInterface:
 						mime_type = part.inline_data.mime_type
 						b64_image = base64.b64encode(image_bytes).decode('utf-8')
 						return f"data:{mime_type};base64,{b64_image}"
-			return "assets/images/placeholder.png"
+			return "assets/images/placeholder.webp"
 		except Exception as e:
 			logger.error(f"Error generating image: {e}")
-			return "assets/images/placeholder.png"
+			return "assets/images/placeholder.webp"
 
 
 
@@ -393,14 +393,6 @@ class UInterface:
 			],direction='horizontal',gap=3),
 		],color=color,dismissable=dismissable, className=f'alert-{color}')
 		return alert
-
-	def get_random_song(self):
-		pathname = self.base_dir / 'assets' / 'data' / 'taylor_swift_songs.csv'
-		with open(pathname) as g:
-			df = pd.read_csv(g, sep=",", header=0)
-		r = random.randrange(len(df.index))
-		q = df.iloc[r]
-		return q
 
 @callback(
 	Output("ai-onboarding-modal", "is_open"),

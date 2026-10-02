@@ -41,78 +41,16 @@ def register_callbacks(app):
 # Global
 #######################
 
-	app.clientside_callback(
-		"""
-		function(n_intervals) {
-			if (n_intervals > 0) {
-				window.location.reload(true);
-			}
-			return ''; 
-		}
-		""",
-		Output('full-refresh-script','children'),
-		Input('full-refresh-interval','n_intervals'),
-	)
-
 	@app.callback(
-		Output('offcanvas-sidebar','is_open'),
-		Input('nav-logo','n_clicks')
+		Output('offcanvas-sidebar', 'is_open'),
+		Input('nav-toggle', 'n_clicks'),
+		Input('_pages_location', 'pathname'),
+		State('offcanvas-sidebar', 'is_open'),
+		prevent_initial_call=True,
 	)
-	def open_sidebar(n_clicks):
-		logger.info('[' + str(datetime.now()) + '] | '+ '[open_sidebar] | ' + str(dash.ctx.triggered_id))
-		if dash.ctx.triggered_id == None:
-			raise PreventUpdate
-		if n_clicks !=None:
-			return True
-
-
-
-	@app.callback(
-		Output('download-results-downloader', 'data'),
-		Input('download-results-button','n_clicks'),
-		State('download-results-store','data'),
-		prevent_initial_call=True
-	)
-	def download_files(n_clicks, data):
-		"""
-			Download results as zip of csv files
-			The dcc.Store has data in the format:
-			{
-				'table_name_1': [ {row1}, {row2}, ... ],
-				'table_name_2': [ {row1}, {row2}, ... ],
-				...
-			}
-		"""
-		logger.info(f'[{datetime.now()}] | [download_files] | trig_id: [{dash.ctx.triggered_id}]')
-		if n_clicks == None:
-			raise PreventUpdate
-		else:
-			try:
-				results = json.loads(data)
-			except Exception as e:
-				logger.error(f'Error loading data from store: {e}')
-				raise PreventUpdate
-			for key, value in results.items():
-				if not isinstance(value, list):
-					try:
-						value = json.loads(value)
-					except Exception as e:
-						logger.error(f'Error loading table {key} data: {e}')
-						raise PreventUpdate
-				results[key] = pd.DataFrame(value)
-			zip_buffer = io.BytesIO()
-			with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-				for name,df in results.items():
-					csv_buffer = io.StringIO()
-					df.to_csv(csv_buffer, index=False)
-					zf.writestr(f"{name}.csv", csv_buffer.getvalue())
-
-			zip_buffer.seek(0)  # Rewind the buffer for reading
-			return dcc.send_bytes(zip_buffer.getvalue(), 'results.zip')
-			# single file version:
-			# df = pd.DataFrame().from_dict(json.loads(data))
-			# csv_string = df.to_csv(index=False)
-			# return dcc.send_string(csv_string, 'results.csv')
+	def toggle_mobile_nav(n_clicks, pathname, is_open):
+		# The menu button toggles the mobile menu; following one of its links closes it
+		return not is_open if dash.ctx.triggered_id == 'nav-toggle' else False
 
 #######################
 # Home
@@ -310,11 +248,12 @@ def register_callbacks(app):
 		# 	raise PreventUpdate
 		ui = dashboard_ui()
 		data = ui.default_configs
-		try:
-			data = json.loads(store_data)
-		except Exception as e:
-			logger.error(f'Could not load configs from store: {e}')
-			pass
+		# The store is empty on first load; defaults apply then
+		if store_data is not None:
+			try:
+				data = json.loads(store_data)
+			except Exception as e:
+				logger.error(f'Could not load configs from store: {e}')
 		try:
 			data['date'] = st_date
 			data['country'] = st_country

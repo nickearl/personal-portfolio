@@ -5,7 +5,7 @@ import re
 import socket
 from datetime import date, datetime, timedelta
 import flask
-from flask import Flask, request, make_response, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
@@ -14,7 +14,6 @@ from flask.helpers import get_root_path
 import pandas as pd
 import plotly.io as pio
 from conf import GlobalUInterface, DISPLAY_NAME, BASE_PATH as APP_SLUG
-from auth import is_app_authenticated
 load_dotenv(find_dotenv())
 
 """
@@ -26,9 +25,6 @@ Core dependencies:
 	uv add flask gunicorn requests dash dash-bootstrap-components python-dotenv pandas numpy plotly pytz bs4
 LLMs (Optional):
 	pip install google-generativeai openai
-
-Google Auth (Optional):
-	pip install flask-dance google-auth google-auth-oauthlib oauthlib cryptography redis
 
 Slack (Optional):
 	pip install slack-sdk
@@ -44,22 +40,20 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-DEPLOY_ENV = os.getenv('DEPLOY_ENV', 'prod')
-if DEPLOY_ENV.lower() == 'dev':
-	os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 SERVER_NAME = os.environ.get('SERVER_NAME')
 BASE_PATH = f'/{APP_SLUG}'
-FLASK_SECRET_KEY = os.environ['FLASK_SECRET_KEY'] 
-# Boolean flag from env; accepts 1/true/yes/on
-ENABLE_GOOGLE_AUTH = os.getenv('ENABLE_GOOGLE_AUTH', 'false').strip().lower() in ('1', 'true', 'yes', 'on')
-cache_uuid = uuid.uuid4().hex
+FLASK_SECRET_KEY = os.environ['FLASK_SECRET_KEY']
+SITE_URL = 'https://portfolio.nickearl.net'
+
+# Dash builds each page's link-preview meta tags by matching the request path against page paths, but
+# compares the full path ("portfolio/dashboard") with paths registered without the routes prefix
+# ("dashboard"), so no page ever matched and previews fell back to blank. Strip the prefix first.
+_dash_path_to_page = dash._pages._path_to_page
+dash._pages._path_to_page = lambda path_id: _dash_path_to_page(path_id.removeprefix(APP_SLUG).strip('/'))
 ui = GlobalUInterface()
 
 def serve_app_layout():
 	def layout():
-		if ENABLE_GOOGLE_AUTH and not is_app_authenticated():
-				return html.Div(["You are not authorized to view this page. Please ",html.A("log in.",href=f'{BASE_PATH}/login')])
-		logger.info('Serving protected layout...')
 		logger.debug(f'Flask session id: {flask.session.get("session_id")}')
 		return ui.render_global_wrapper(flask.session)
 	return layout
@@ -82,6 +76,8 @@ def assemble_dash_app_from_components(server, url_base_pathname, assets_folder, 
 		update_title=None,
 		use_pages=use_pages,
 		pages_folder=pages_folder,
+		# gzip responses: Cloud Run doesn't compress, and plotly.js plus the dashboard's data payload are ~13MB raw
+		compress=True,
 		external_stylesheets=[dbc.themes.FLATLY, dbc.icons.BOOTSTRAP,dbc.icons.FONT_AWESOME])
 	logger.info(f'host ip: {socket.gethostbyname(socket.gethostname())}')
 	logger.info(f'host name: {socket.gethostname()}')
@@ -122,12 +118,17 @@ def register_dash_app(app, app_dir, title, base_pathname, create_dash_fun, regis
 					page_config['display_name'],
 					title=f'{DISPLAY_NAME} | {page_config["display_name"]}',
 					path=page_config['path'],
+					# Link previews (og:/twitter: tags); image is relative to the assets folder
+					description=page_config['share_description'],
+					image=f'images/share/{page_name}.jpg',
 					layout=page_layout(page_ui()))
 
 		register_callbacks_fun(new_dash_app)
 
 def create_flask_server():
 	server = flask.Flask(__name__)
+	# Cloud Run terminates TLS; trust its X-Forwarded-Proto so generated URLs (link previews) use https
+	server.wsgi_app = ProxyFix(server.wsgi_app, x_proto=1)
 	logger.info('* Initializing Flask server * ')
 	server.secret_key = FLASK_SECRET_KEY
 	logger.info(f'Got secret key')
@@ -151,17 +152,24 @@ def create_flask_server():
 		def healthz():
 			return 'ok', 200
 
-	if ENABLE_GOOGLE_AUTH:
-		logger.info('* Google Auth enabled * ')
-		from auth import setup_oauth
-		server = setup_oauth(server=server, base_path=BASE_PATH)
-		logger.info('OAuth setup complete.')
-	else:
 		@server.route('/')
 		def index():
 			return flask.redirect(BASE_PATH)
-	
-		logger.info('Flask routes configured.')
+
+		@server.route('/robots.txt')
+		def robots():
+			return flask.Response(f'User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n', mimetype='text/plain')
+
+		@server.route('/sitemap.xml')
+		def sitemap():
+			urls = ''.join(f'<url><loc>{SITE_URL}{p["full_path"]}</loc></url>' for p in ui.pages.values() if p['enabled'])
+			return flask.Response(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>', mimetype='application/xml')
+
+		@server.route('/favicon.ico')
+		def favicon():
+			return flask.send_from_directory(get_root_path(__name__) + '/dash_app/assets', 'favicon.ico')
+
+	logger.info('Flask routes configured.')
 
 	return server
 

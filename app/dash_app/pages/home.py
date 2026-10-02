@@ -31,25 +31,25 @@ class UInterface:
 					'logo': 'variety_logo.png',
 					'url': 'https://variety.com/lists/video-game-tv-series-ideas-study/',
 					'text': 'What Video Games Should Streamers Adapt?',
-					'images': ['variety_1.png','variety_2.png'],
+					'images': ['variety_1.webp','variety_2.webp'],
 				},
 				'Ad Week': {
 					'logo': 'adweek_logo.png',
 					'url': 'https://www.adweek.com/convergent-tv/streamer-releases-weekly-binge/',
 					'text': "Binge or Weekly? Here's the Best Way for Streamers to Release Shows",
-					'images': ['adweek_1.png'],
+					'images': ['adweek_1.webp'],
 				},
 				'LA Times': {
 					'logo': 'latimes_logo.png',
 					'url': 'https://www.latimes.com/entertainment-arts/tv/newsletter/2024-08-09/the-boys-bridgerton-house-of-the-dragon-the-bear-weekly-binge-screen-gab',
 					'text': "Weekly Episode Drops are Better Than Binge.  And There's Data to Back it Up.",
-					'images': ['latimes_1.png','latimes_2.png'],
+					'images': ['latimes_1.webp','latimes_2.webp'],
 				},
 				'TheWrap': {
 					'logo': 'thewrap_logo.png',
 					'url': 'https://www.thewrap.com/fandom-avatar-top-gun-oscars-fan-vote/',
 					'text': 'What if Fans Voted for the Oscars?',
-					'images': ['thewrap_1.png'],
+					'images': ['thewrap_1.webp'],
 				},
 			}
 		}
@@ -66,7 +66,7 @@ class UInterface:
 				2. **Bedtime Monster**: A creative storyteller.
 				3. **Maya**: A virtual dental assistant.
 			""",
-			'image': 'assets/images/ai_interview.png',
+			'image': 'assets/images/ai_interview.webp',
 			'enabled': True,
 		}
 
@@ -91,7 +91,7 @@ class UInterface:
 			'nick': {
 				'name': "Nick's AI Clone: Virtual Interview",
 				'id': "agent_7701kha7yzdzew5v1da6tmx3mw4s",
-				'image': 'assets/images/pixel_nick_synthwave_cropped_lo_res.png',
+				'image': 'assets/images/pixel_nick_synthwave_cropped_lo_res.webp',
 				'description': "An AI digital twin trained on my professional history, leadership & technical skills, and project portfolio.",
 				'technical_details': "Built using RAG (Retrieval Augmented Generation) on a structured career dataset.",
 				'topics': [
@@ -104,7 +104,7 @@ class UInterface:
 			'monster': {
 				'name': "Bedtime Monster: Creative Storyteller",
 				'id': "agent_9301kh7mfbt9e0ksvxpw0cfwrwb8",
-				'image': 'assets/images/bedtime_monster_scaled.png',
+				'image': 'assets/images/bedtime_monster_scaled.webp',
 				'description': "A friendly, imaginative monster designed to tell bedtime stories.",
 				'technical_details': "Configured with a high temperature for creativity and a whimsical system prompt. It demonstrates the versatility of LLMs to generate creative fiction on the fly.",
 				'topics': [
@@ -117,7 +117,7 @@ class UInterface:
 			'maya': {
 				'name': "Maya: Dental Office Assistant",
 				'id': "agent_4401kh7af5kee1b9e7k1am38csd2",
-				'image': 'assets/images/maya_scaled.png',
+				'image': 'assets/images/maya_scaled.webp',
 				'description': "A demo agent developed for the American Association of AI in Dental, showcasing how AI agents can be customized for specific industry verticals and customer service tasks.",
 				'technical_details': "Equipped with knowledge base developed by medical professionals for informational, non-diagnostic purposes. Strict guardrails against attempting diagnosis, restrict response lengths/types given medium (typically a phone call).",
 				'topics': [
@@ -194,12 +194,12 @@ class UInterface:
 				dbc.Stack([
 					dcc.Markdown(self.global_ui.layout['intro_text'],className='intro-text px-2'),
 					dbc.Stack([
-						html.Img(src='assets/images/pixel_nick_synthwave_cropped_lo_res.png',className='intro-image'),
+						html.Img(src='assets/images/pixel_nick_synthwave_cropped_lo_res.webp',className='intro-image'),
 						html.A([html.I(className='bi bi-linkedin'),' linkedin.com/in/nickearl'],href='https://www.linkedin.com/in/nickearl/',target='_blank',className='intro-link'),
 						html.A([html.I(className='bi bi-github'),' github.com/nickearl'],href='https://github.com/nickearl/',target='_blank',className='intro-link'),
 						html.A([html.I(className='bi bi-at'),' nickearl.net'],href='https://www.nickearl.net',target='_blank',className='intro-link'),
 					],gap=3, className='align-items-center justify-content-start'),
-				],direction='horizontal', gap=3)
+				],direction='horizontal', gap=3, className='stack-mobile')
 			],color='light',className='shadow-lg align-items-center justify-content-center',style={'flex':'1','border-radius':'1rem','border-width':'3px','max-width': self.conf['panel_width'],'width':'100%','padding':'1rem'}),
 			'virtual_interview': dbc.Card([
 				dbc.CardHeader([
@@ -237,7 +237,7 @@ class UInterface:
 					html.Img(src=f'assets/images/company_logos/{f.name}', className='employer-logo', title=f.stem.replace('_', ' ').title())
 				)
 
-		self.layout['logos'] = dbc.Stack(logo_imgs, direction='horizontal', gap=4, className='justify-content-center align-items-center my-4')
+		self.layout['logos'] = dbc.Stack(logo_imgs, direction='horizontal', gap=4, className='flex-wrap row-gap-3 justify-content-center align-items-center my-4 px-3')
 		
 		self.conf['panels']['virtual_interview']['content_right'] = self.layout['virtual_interview']
 
@@ -313,7 +313,7 @@ class UInterface:
 			config:
 			{
 				'prefix':'dash',
-				'image': 'assets/images/dashboard_screenshot.png',
+				'image': 'assets/images/dashboard_screenshot.webp',
 				'display_name': 'Interactive Data Visualization',
 				'summary_header': 'An interactive demo dashboard for a fictional new streaming service',
 				'summary_text': ""
@@ -334,14 +334,14 @@ class UInterface:
 
 		card = dbc.Card([
 			dbc.CardHeader(config['display_name'],style={'font-size':'1.5rem','font-weight':'bold','border-top-left-radius':'1rem','border-top-right-radius':'1rem','width':'100%'}),
-			dbc.CardBody([
+			dbc.CardBody(className='panel-body', children=[
 				dbc.Stack([
 					dbc.Button([
 						dbc.Stack([
 							content_left,
 							content_right
-						],direction='horizontal',gap=3,className='align-items-start justify-content-around'),
-					],href=config['full_path'] if 'full_path' in config.keys() and config['full_path'] else None,className='shadow-lg bg-light',style={'color':'black','flex':'1','border': '0px black solid','border-radius':'1rem','width':'75vw'}),
+						],direction='horizontal',gap=3,className='align-items-start justify-content-around stack-mobile'),
+					],href=config['full_path'] if 'full_path' in config.keys() and config['full_path'] else None,className='shadow-lg bg-light panel-button',style={'color':'black','flex':'1','border': '0px black solid','border-radius':'1rem','width':'75vw'}),
 				],gap=3,className='align-items-center justify-content-center')
 			])
 		],color='light',className='shadow-lg align-items-center justify-content-center',style={'flex':'1','border-radius':'1rem','border-width':'3px','max-width': self.conf['panel_width'],'width':'100%'})

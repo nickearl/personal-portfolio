@@ -45,32 +45,32 @@ This file contains context and architectural notes for the `personal-portfolio` 
 ## Content & Features
 
 *   **Home / Portfolio (`pages/home.py`):**
-    *   Landing page with professional introduction.
-    *   **Interactive Resume:** Data sourced from `assets/data/resume.json`. Parsed and rendered dynamically.
-    *   **Press Coverage:** Carousel of articles and media mentions.
-*   **AI Demonstrations (`pages/ai.py`):**
-    *   **Generative UI:** Using OpenAI to generate color themes and CSS on the fly based on user prompts.
-    *   **Image Generation:** DALL-E 3 integration for dynamic asset creation.
-    *   **Virtual Interviewer:** Integration with ElevenLabs and LLMs to simulate a voice-interactive interview (Nick's AI Clone).
+    *   Landing page with professional introduction, employer logo strip (every file in `assets/images/company_logos/`), demo panels, and press coverage of analyses.
+    *   **AI Agents:** ElevenLabs widgets, including Nick's AI Clone. Its knowledge base lives in ElevenLabs and is maintained by hand, not from this repo.
+*   **Design Lab (`pages/ai.py`):** Gemini theme generator (text) and style-wrapped image generator.
+*   **Sales Enablement (`pages/sales_enablement.py`):** progressive deck generator (see pattern 5).
+*   **Layout:** below Bootstrap's lg breakpoint the fixed sidebar is replaced by a menu button + offcanvas; two-column sections carry `.stack-mobile` and stack below md (`assets/styles.css`). Charts autosize; don't give figures fixed widths.
 
 ## Common Tasks & Commands
 
 *   **Run Local:** `flask --app app run -p 8050`
-*   **Dependency Management:** Uses `uv` (e.g., `uv add openai`).
+*   **Dependency Management:** Uses `uv` (e.g., `uv add <package>`).
 *   **Deployment:** Push to `main` deploys the app; `./bootstrap.sh` plans/applies Terraform.
 
 ## Directory Map
 
 *   `app/`: Application source.
-*   `app/dash_app/assets/`: CSS, Images, and Data Files (`resume.json`).
+*   `app/dash_app/assets/`: CSS, `posthog.js`, images (WebP; `share/` = 1200x630 link-preview JPGs), data CSVs.
+    *   Everything in `assets/` is publicly downloadable at `/portfolio/assets/...`, so never put private data there.
 *   `app/dash_app/pages/`: Dashboard logic.
 *   `infrastructure/`: Terraform (Cloud Run, secrets, domain mapping, DNS, CI identity).
 
 ## External Data & APIs
 
-*   **OpenAI API:** Used for text and image generation.
-*   **ElevenLabs API:** Used for voice synthesis and conversational AI.
-*   **Local Data:** `resume.json` acts as the primary data source for the portfolio section, treated as a structured document store.
+*   **Google Gemini API:** text and image generation (key: Secret Manager `personal-portfolio-gemini-api-key`).
+*   **ElevenLabs:** voice/chat agents embedded on the home page.
+*   **PostHog:** web analytics, cookieless (`assets/posthog.js`, production hostname only).
+*   **Link previews:** `app.py` wraps Dash's `_pages._path_to_page` so meta tags match pages under the `/portfolio` prefix; descriptions are `share_description` in `conf.py`.
 
 ## Infrastructure
 

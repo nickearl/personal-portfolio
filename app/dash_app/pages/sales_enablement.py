@@ -19,14 +19,6 @@ from google import genai
 from google.genai import types
 from conf import GlobalUInterface
 from dash_app.utils import load_secret
-try:
-	import google.auth
-	from googleapiclient.discovery import build
-	from googleapiclient.http import MediaIoBaseDownload
-	from google.cloud import storage
-except ImportError:
-	build = None
-	storage = None
 
 # Get environment variables
 load_dotenv(find_dotenv())
@@ -76,14 +68,14 @@ class UInterface:
 			"Weyland-Yutani", "Heavy Industry", "Technical Team", "Cyberpunk", "Short and funny"
 		)
 		self.example_deck = html.Div([
-			self.deck_grid([(None, self.slide_image(f'assets/images/weyland-yutani_{n}.jpeg')) for n in range(1, 6)]),
+			self.deck_grid([(None, self.slide_image(f'assets/images/weyland-yutani_{n}.webp')) for n in range(1, 6)]),
 			self.default_plaque,
 		])
 
 		self.layout = {
 			'header': dbc.Stack([
 				dbc.Stack([
-					# html.Img(src='assets/images/robot_and_human.png',style={'width':'150px','height':'150px'}),
+					# html.Img(src='assets/images/robot_and_human.webp',style={'width':'150px','height':'150px'}),
 					html.Img(src=self.conf['image'],style={'width':'150px','height':'150px'}),
 					html.H3(self.conf['display_name']),
 				],direction='horizontal',gap=3,className='justify-content-end',style={'width':'50%','max-width':'500px'}),
@@ -161,7 +153,7 @@ class UInterface:
 								html.Br(),
 								dbc.Button([html.I(className='bi bi-easel'), " Generate Deck"], id='sales-pitch-submit', color='primary', className='w-100'),
 							], gap=2),
-						], width=4, style={'border-right': '1px solid #eee'}),
+						], xs=12, md=4, className='sales-form-col mb-4 mb-md-0'),
 						dbc.Col([
 							dcc.Loading(
 								id='sales-pitch-loading',
@@ -181,7 +173,7 @@ class UInterface:
 								], className="d-flex flex-column align-items-center justify-content-center p-5 bg-white shadow rounded"),
 								overlay_style={"visibility":"visible", "filter": "blur(4px)", "opacity": "0.8", "background-color": "white"},
 							)
-						], width=8),
+						], xs=12, md=8),
 					]),
 				]),
 			]),
@@ -191,11 +183,11 @@ class UInterface:
 		return html.Div([
 			html.H6("Generation Parameters", className="text-uppercase text-muted mb-3", style={'letter-spacing': '1px'}),
 			dbc.Stack([
-				html.Div([html.Small("Company", className="fw-bold text-secondary"), html.Div(company, className="fs-5 text-dark")]),
-				html.Div([html.Small("Industry", className="fw-bold text-secondary"), html.Div(industry)]),
-				html.Div([html.Small("Audience", className="fw-bold text-secondary"), html.Div(audience)]),
-				html.Div([html.Small("Style", className="fw-bold text-secondary"), html.Div(style)]),
-				html.Div([html.Small("Length", className="fw-bold text-secondary"), html.Div(length)]),
+				html.Div([html.Small("Company", className="fw-bold text-secondary"), html.Div(company or '—', className="fs-5 text-dark")]),
+				html.Div([html.Small("Industry", className="fw-bold text-secondary"), html.Div(industry or '—')]),
+				html.Div([html.Small("Audience", className="fw-bold text-secondary"), html.Div(audience or '—')]),
+				html.Div([html.Small("Style", className="fw-bold text-secondary"), html.Div(style or '—')]),
+				html.Div([html.Small("Length", className="fw-bold text-secondary"), html.Div(length or '—')]),
 			], gap=3)
 		], className="mt-4 p-4 rounded shadow-sm", style={'background-color': '#e9ecef', 'border-left': '5px solid #6c757d'})
 
@@ -325,28 +317,6 @@ class UInterface:
 		return html.Div(children, className='d-flex align-items-center justify-content-center gap-2 p-3 text-center',
 			style={'aspect-ratio': '16 / 9', 'background-color': '#e9ecef', 'border-radius': '0.5rem'})
 
-	def _hex_to_rgb_float(self, hex_color):
-		try:
-			hex_color = hex_color.lstrip('#')
-			return tuple(int(hex_color[i:i+2], 16)/255.0 for i in (0, 2, 4))
-		except:
-			return (0, 0, 0)
-
-	def _upload_to_gcs(self, image_stream):
-		bucket_name = os.environ.get('GCS_BUCKET_NAME')
-		if not bucket_name or not storage:
-			logger.warning("GCS_BUCKET_NAME not set or storage lib missing. Skipping image upload.")
-			return None
-		try:
-			client = storage.Client()
-			bucket = client.bucket(bucket_name)
-			blob = bucket.blob(f"slide_assets/{uuid.uuid4()}.png")
-			blob.upload_from_file(image_stream, content_type='image/png')
-			return blob.public_url
-		except Exception as e:
-			logger.error(f"GCS Upload failed: {e}")
-			return None
-
 	def show_alert(self, text, color='warning'):
 		icon = None
 		dismissable = True
@@ -362,15 +332,6 @@ class UInterface:
 		],color=color,dismissable=dismissable, className=f'alert-{color}')
 		return alert
 
-	def get_random_song(self):
-		pathname = os.path.join(self.base_dir, 'assets', 'data', 'taylor_swift_songs.csv')
-		with open(pathname) as g:
-			df = pd.read_csv(g, sep=",", header=0)
-		r = random.randrange(len(df.index))
-		q = df.iloc[r]
-		return q
-
-	
 def create_app_layout(ui):
 
 	layout = dbc.Container([
