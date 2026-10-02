@@ -35,7 +35,7 @@ provider "github" {
 
 # Enable required APIs
 resource "google_project_service" "services" {
-  for_each           = toset(["iam.googleapis.com", "cloudresourcemanager.googleapis.com", "iamcredentials.googleapis.com", "artifactregistry.googleapis.com", "secretmanager.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "apikeys.googleapis.com", "generativelanguage.googleapis.com"])
+  for_each           = toset(["iam.googleapis.com", "cloudresourcemanager.googleapis.com", "iamcredentials.googleapis.com", "artifactregistry.googleapis.com", "secretmanager.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "apikeys.googleapis.com", "monitoring.googleapis.com", "generativelanguage.googleapis.com"])
   project            = var.project_id
   service            = each.key
   disable_on_destroy = false
