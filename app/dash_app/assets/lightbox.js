@@ -61,6 +61,13 @@
         deck = slide.closest('.deck-grid');
         lastFocus = document.activeElement;
         show(slides().indexOf(slide));
+        if (window.portfolioTrack) {
+            // generated slides sit in render slots whose ids carry "sales-slide"; the example deck doesn't
+            window.portfolioTrack('deck_slide_enlarged', {
+                deck: slide.closest('[id*="sales-slide"]') ? 'generated' : 'example',
+                slide: index + 1,
+            });
+        }
         overlay.classList.add('open');
         document.body.classList.add('lightbox-lock');
         closeBtn.focus();

@@ -1,9 +1,10 @@
 // PostHog web analytics (Dash loads every .js file in assets/ on all pages).
-// Basics only: pageviews, including Dash's in-app page changes, plus autocaptured clicks. Session recording is off.
-// persistence 'memory' sets no cookies or local storage, so no consent banner is needed; the trade-off is
-// that a full page reload counts as a new visitor. The project key is public by design.
+// Pageviews (including Dash's in-app page changes) and page leaves, plus the named feature events in
+// analytics.js. Raw click autocapture, session replay, heatmaps, web vitals and surveys are off here,
+// which overrides the project's settings. persistence 'memory' sets no cookies or local storage, so no
+// consent banner is needed; a full page reload counts as a new visitor. The project key is public by design.
 (function () {
-    var POSTHOG_KEY = 'phc_stmJyehFrc5GfpWzY2tXvd3GNYLds4muCSDAHoEZrRrT';  // PostHog project "Portfolio" (640999)
+    var POSTHOG_KEY = 'phc_oR4CVu23N3x93JWYhevazEsyP4NihZwG5Pbggvt2LwPq';  // PostHog org "Portfolio", project "Portfolio" (642218)
     var POSTHOG_HOST = 'https://us.i.posthog.com';
     if (!POSTHOG_KEY || window.location.hostname !== 'portfolio.nickearl.net') return;
 
@@ -15,6 +16,11 @@
         defaults: '2026-05-30',          // includes history-based pageviews for single-page apps
         persistence: 'memory',
         person_profiles: 'identified_only',
+        autocapture: false,
         disable_session_recording: true,
+        enable_heatmaps: false,
+        capture_dead_clicks: false,
+        capture_performance: false,
+        disable_surveys: true,
     });
 })();

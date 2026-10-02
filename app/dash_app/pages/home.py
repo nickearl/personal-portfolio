@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import pathlib
 import random
@@ -180,7 +181,9 @@ class UInterface:
 						<elevenlabs-convai agent-id="{config['id']}"></elevenlabs-convai>
 					""",
 					style={'width': '100%', 'height': '600px', 'border': 'none', 'position': 'relative', 'z-index': 1},
-					allow="microphone"
+					allow="microphone",
+					# analytics.js reports ai_agent_call_started with this name
+					**{'data-agent': config['name']}
 				)
 			], style={'position': 'relative', 'height': '600px', 'background-color': '#f8f9fa'})
 
@@ -262,7 +265,8 @@ class UInterface:
 							html.Img(src=f'assets/images/{v['logo']}', className='a-list-logo')
 						],className='d-flex align-items-start justify-content-center w-100 ps-2',style={'min-width':'100px'}),
 						dbc.Stack([
-							html.A(v['text'],href=v['url'],target='_blank',className='carousel-link'),
+							html.A(v['text'],href=v['url'],target='_blank',className='carousel-link',
+								**{'data-track': 'press_article_opened', 'data-track-props': json.dumps({'publication': k, 'headline': v['text']})}),
 						],className='bg-light d-flex align-items-center justify-content-center w-100',style={'border-top-right-radius':'.5rem','border-bottom-right-radius':'.5rem'}),
 					],direction='horizontal',gap=1,className='d-flex justify-content-start align-items-center',style={'min-height':'6rem'}),
 				],className='bg-dark a-list-button',id=f'a-list-button-{a_count}',style={'background':'none'})
