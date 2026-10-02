@@ -1,4 +1,5 @@
 import os
+import time
 import logging
 import flask
 import json
@@ -30,6 +31,11 @@ HOME_UI = None
 DASHBOARD_UI = None
 SALES_UI = None
 
+def analytics_event(event, **props):
+	"""Payload for the 'analytics-event' store; the clientside callback below sends it to PostHog from the
+	visitor's browser so it joins their session. 'ts' makes repeated identical events distinct."""
+	return {'event': event, 'props': props, 'ts': time.time()}
+
 def register_callbacks(app):
 	global AI_UI, DASHBOARD_UI, HOME_UI, SALES_UI
 	if AI_UI is None: AI_UI = ai_ui()
@@ -51,6 +57,57 @@ def register_callbacks(app):
 	def toggle_mobile_nav(n_clicks, pathname, is_open):
 		# The menu button toggles the mobile menu; following one of its links closes it
 		return not is_open if dash.ctx.triggered_id == 'nav-toggle' else False
+
+	# Analytics: window.portfolioTrack (assets/analytics.js) is a no-op unless PostHog is initialised
+	app.clientside_callback(
+		"""
+		function(payload) {
+			if (payload && window.portfolioTrack) window.portfolioTrack(payload.event, payload.props);
+			return window.dash_clientside.no_update;
+		}
+		""",
+		Output('analytics-sink', 'data', allow_duplicate=True),
+		Input('analytics-event', 'data'),
+		prevent_initial_call=True,
+	)
+
+	app.clientside_callback(
+		"""
+		function() {
+			// Only selections count: dropdowns also "change" from null to [] when the page mounts
+			const t = (window.dash_clientside.callback_context.triggered || [])[0];
+			const v = t && t.value;
+			const selected = Array.isArray(v) ? v.length : (v === null || v === undefined || v === '' ? 0 : 1);
+			if (selected && window.portfolioTrack) {
+				window.portfolioTrack('dashboard_filter_changed', {
+					filter: t.prop_id.split('.')[0].replace(/^filter-/, ''),
+					values_selected: selected,
+				});
+			}
+			return window.dash_clientside.no_update;
+		}
+		""",
+		Output('analytics-sink', 'data', allow_duplicate=True),
+		Input('filter-date', 'value'),
+		Input('filter-country', 'value'),
+		Input('filter-device-type', 'value'),
+		Input('filter-video-category', 'value'),
+		Input('filter-video-title', 'value'),
+		Input('filter-num-chart-items', 'value'),
+		prevent_initial_call=True,
+	)
+
+	app.clientside_callback(
+		"""
+		function(n) {
+			if (n && window.portfolioTrack) window.portfolioTrack('dashboard_csv_downloaded', {});
+			return window.dash_clientside.no_update;
+		}
+		""",
+		Output('analytics-sink', 'data', allow_duplicate=True),
+		Input('download-csv', 'n_clicks'),
+		prevent_initial_call=True,
+	)
 
 #######################
 # Home
@@ -104,6 +161,7 @@ def register_callbacks(app):
 
 	@app.callback(
 		Output('ai-image-container','children'),
+		Output('analytics-event', 'data', allow_duplicate=True),
 		Input('ai-input-image-submit', 'n_clicks'),
 		State('ai-input-image-text','value'),
 		running=[
@@ -122,16 +180,20 @@ def register_callbacks(app):
 				ui = ai_ui()
 				retry_after = rate_limit.check('design_image')
 				if retry_after:
-					return ui.show_alert(rate_limit.limit_message('design_image', retry_after))
+					return ui.show_alert(rate_limit.limit_message('design_image', retry_after)), analytics_event('image_generated', outcome='rate_limited')
+				t0 = time.monotonic()
 				try:
 					image_url = ui.ai_generate_image(input_prompt, style='anime')
 				except Exception as e:
 					logger.error(f'Error getting image url: {e}')
-				return html.Img(src=image_url,style={'width':'100%','border-radius':'4rem','padding':'2rem'})
+				event = analytics_event('image_generated', outcome='success' if image_url else 'failed', seconds=round(time.monotonic() - t0, 1))
+				return html.Img(src=image_url,style={'width':'100%','border-radius':'4rem','padding':'2rem'}), event
+			raise PreventUpdate
 
 
 	@app.callback(
 		Output('ai-chart-container','children'),
+		Output('analytics-event', 'data', allow_duplicate=True),
 		Input('ai-input-colors-submit', 'n_clicks'),
 		State('ai-input-colors-text','value'),
 		running=[
@@ -156,7 +218,9 @@ def register_callbacks(app):
 					return dbc.Stack([
 						ui.show_alert(rate_limit.limit_message('design_theme', retry_after)),
 						dashboard_ui().render_summary_charts(w=750,h=400,chart_only=True),
-					],gap=3)
+					],gap=3), analytics_event('theme_generated', outcome='rate_limited')
+				t0 = time.monotonic()
+				outcome = 'success'
 				try:
 					colors = ui.ai_color_sequence(input_prompt)
 					o = dashboard_ui().render_summary_charts(w=750,h=400,chart_only=True,colors=colors)
@@ -168,14 +232,17 @@ def register_callbacks(app):
 						o = dashboard_ui().render_summary_charts(w=750,h=400,chart_only=True,colors=colors)
 					except Exception as e:
 						logger.error('Retry failed, falling back to default colors')
+						outcome = 'failed'
 						o = dbc.Stack([
 							ui.show_alert("We didn't get a usable response from Gemini. Sometimes you get a miss!  Try your prompt again, or try modifying it slightly.",color='warning'),
 							dashboard_ui().render_summary_charts(w=750,h=400,chart_only=True),
 						],gap=3)
-				return o
+				return o, analytics_event('theme_generated', outcome=outcome, seconds=round(time.monotonic() - t0, 1))
+			raise PreventUpdate
 		 
 	@app.callback(
 		Output('sales-pitch-output', 'children'),
+		Output('analytics-event', 'data', allow_duplicate=True),
 		Input('sales-pitch-submit', 'n_clicks'),
 		State('sales-input-company', 'value'),
 		State('sales-input-industry', 'value'),
@@ -189,13 +256,19 @@ def register_callbacks(app):
 		logger.info(f'[{datetime.now()}] | [sales_plan_deck] | trig_id: [{dash.ctx.triggered_id}]')
 		if not n_clicks:
 			raise PreventUpdate
+		# how many of the five fields the visitor filled in (an empty form still makes a deck)
+		fields_filled = sum(bool(str(v or '').strip()) for v in (company, industry, audience, style, length))
 		retry_after = rate_limit.check('sales_deck')
 		if retry_after:
-			return [SALES_UI.show_alert(rate_limit.limit_message('sales_deck', retry_after)), SALES_UI.example_deck]
+			event = analytics_event('deck_generated', outcome='rate_limited', fields_filled=fields_filled)
+			return [SALES_UI.show_alert(rate_limit.limit_message('sales_deck', retry_after)), SALES_UI.example_deck], event
+		t0 = time.monotonic()
 		plan = SALES_UI.plan_deck(company, industry, audience, style, length)
+		seconds = round(time.monotonic() - t0, 1)
 		if 'error' in plan:
-			return dcc.Markdown(plan['error'])
-		return SALES_UI.render_deck(plan, company, industry, audience, style, length)
+			return dcc.Markdown(plan['error']), analytics_event('deck_generated', outcome='failed', plan_seconds=seconds, fields_filled=fields_filled)
+		event = analytics_event('deck_generated', outcome='success', slides=len(plan['slides']), plan_seconds=seconds, fields_filled=fields_filled)
+		return SALES_UI.render_deck(plan, company, industry, audience, style, length), event
 
 	# Fires once per slide placeholder as soon as the deck renders; the browser sends these in parallel
 	@app.callback(

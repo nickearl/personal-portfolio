@@ -99,6 +99,6 @@ Push to `main`. The workflow builds the image, pushes it to Artifact Registry, a
 
 ## Analytics, SEO & Link Previews
 
-*   **Analytics:** `app/dash_app/assets/posthog.js` loads PostHog on `portfolio.nickearl.net` only, without cookies. Events go to the PostHog project "Portfolio" (US cloud).
+*   **Analytics:** `app/dash_app/assets/posthog.js` loads PostHog (organization and project "Portfolio", US cloud) on `portfolio.nickearl.net` only, without cookies. It records pageviews plus named feature events: `ai_agent_call_started`, `press_article_opened`, `outbound_link_clicked`, `deck_generated`, `deck_slide_enlarged`, `theme_generated`, `image_generated`, `dashboard_tab_viewed`, `dashboard_filter_changed`, `dashboard_csv_downloaded`. Browser-only events live in `assets/analytics.js`; events whose outcome the server decides (`outcome`: success / failed / rate_limited) go through the `analytics-event` store in `callbacks.py`.
 *   **SEO:** `/robots.txt` and `/sitemap.xml` are served by `app.py` from the enabled pages.
 *   **Link previews:** each page's `share_description` in `conf.py` and its card in `assets/images/share/` feed the description and `og:image` tags.

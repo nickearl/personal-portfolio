@@ -563,6 +563,9 @@ class GlobalUInterface:
 				html.Div([],id='dev-null'),
 			], className='content-wrapper'),
 			dcc.Store(id='session-id-store', data=flask_session.get('session_id')),
+			# Server callbacks put {'event', 'props'} here; a clientside callback sends it to PostHog
+			dcc.Store(id='analytics-event'),
+			dcc.Store(id='analytics-sink'),
 		], fluid=True, className='p-0')
 
 	def render_fail_card(self,
