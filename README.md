@@ -2,7 +2,7 @@
 
 A professional portfolio and technical demonstration platform showcasing capabilities in Data Engineering, BI, and AI/LLM integration.
 
-Built using **Flask** as the web framework and **Plotly Dash** for interactive analytics, with **Redis** and **Celery** managing background tasks and caching.
+Built using **Flask** as the web framework and **Plotly Dash** for interactive analytics, served serverless on **Google Cloud Run**.
 
 ## Features
 
@@ -14,13 +14,14 @@ Built using **Flask** as the web framework and **Plotly Dash** for interactive a
 *   **Sales Enablement Tool:** An AI-powered agent that generates tailored sales presentation outlines and slide content based on prospect data.
 *   **Enterprise-Grade Architecture:**
     *   **Hybrid Flask/Dash:** Seamless integration of standard web routes with reactive Dash apps.
-    *   **Async Processing:** Celery workers handle long-running AI inference tasks to keep the UI responsive.
+    *   **Serverless Hosting:** Runs on Cloud Run with a warm instance for instant first loads, autoscaling under load, and Google-managed TLS on the custom domain.
+    *   **Keyless CI/CD:** GitHub Actions deploys via Workload Identity Federation, with no long-lived credentials; all infrastructure is Terraform.
     *   **Security:** Google OAuth 2.0 authentication with role-based access control (RBAC).
 
 ## Tech Stack
 
 *   **Core:** Python 3.13, Flask, Plotly Dash
-*   **Data & Async:** Pandas, Redis, Celery
+*   **Data:** Pandas, DuckDB
 *   **AI/LLM:** OpenAI API, Google Gemini
 *   **Infrastructure:** Docker, Terraform, Google Cloud Run
 *   **Package Management:** uv
@@ -41,7 +42,6 @@ base-insights-app/
 
 *   Python 3.13+
 *   uv (for dependency management)
-*   Redis (running locally or accessible via URL)
 
 ### 1. Clone & Setup
 
@@ -59,7 +59,7 @@ Create a `.env` file in the repository root directory with the following keys:
 DEPLOY_ENV=dev
 FLASK_SECRET_KEY=<your-secret-key>
 FLASK_ENCRYPTION_KEY=<fernet-key>
-REDIS_URL=redis://localhost:6379/0
+GEMINI_API_KEY=<gemini-api-key>
 SERVER_NAME=Personal Portfolio
 DISPLAY_NAME=Personal Portfolio
 ENABLE_GOOGLE_AUTH=true # or false for local dev without auth
@@ -69,51 +69,32 @@ GOOGLE_OAUTH_CLIENT_SECRET=<client-secret>
 
 ### 3. Running the App
 
-You need two terminal sessions:
-
-**Terminal 1: Flask/Dash Server**
 ```bash
 flask --app ./app/app run -p 1701
-```
-
-**Terminal 2: Celery Worker**
-```bash
-celery --workdir app -A app:celery_app worker --loglevel=INFO --concurrency=2 -Q Base-Insights
 ```
 
 The app will be available at `http://localhost:1701/`.
 
 ## Deployment
 
-Deployment is fully automated via **Terraform** (Infrastructure) and **GitHub Actions** (Application Code).
+Infrastructure is managed by **Terraform** (`infrastructure/`); application code is deployed by **GitHub Actions**.
 
 ### 1. Provision Infrastructure
-Run the bootstrap script to initialize and apply Terraform. This creates the VM, Networking, and Artifact Registry.
 
 ```bash
-./bootstrap.sh
+./bootstrap.sh          # terraform init + apply
+./bootstrap.sh plan     # any terraform subcommand works
 ```
 
-### 2. Configure Secrets
-Terraform will output the secrets needed for CI/CD. Add these to your GitHub Repository under **Settings > Secrets and variables > Actions**:
-*   `GCP_WORKLOAD_IDENTITY_PROVIDER`
-*   `GCP_SERVICE_ACCOUNT`
-*   `GCP_SSH_PRIVATE_KEY`
+This manages the Cloud Run service, its runtime service account and secrets (Flask keys and a dedicated Gemini API key in Secret Manager), Artifact Registry, the custom domain mapping and Cloudflare DNS record, and the Workload Identity Federation pool GitHub Actions uses. It also writes the GitHub Actions secrets and variables the workflow needs. The script reads the Cloudflare token from Secret Manager and authenticates the GitHub provider with `gh auth token`.
 
-### 3. Deploy Application
-The application is deployed automatically when you push to the `main` branch.
+### 2. Deploy Application
 
-1.  Commit and push your code:
-    ```bash
-    git push origin main
-    ```
-2.  **Wait**: The GitHub Action will build the Docker image, push it to Google Artifact Registry, and deploy it to the VM.
-3.  The app will launch automatically.
+Push to `main`. The workflow builds the image, pushes it to Artifact Registry, and runs `gcloud run deploy` with the new image. Only the image changes on deploy; every other service setting is owned by Terraform.
 
-### DNS & SSL
-DNS is managed by Cloudflare. Ensure you have the following variables in your `terraform.tfvars`:
-*   `cloudflare_api_token`: API Token with `Zone.DNS` permissions.
-*   `cloudflare_zone_id`: The Zone ID for your domain found in the Cloudflare dashboard.
+### DNS & TLS
+
+`cloudflare_record.app_dns` is a DNS-only (unproxied) CNAME to `ghs.googlehosted.com`. Google issues and renews the certificate for the domain mapping automatically. The record must stay unproxied or certificate issuance fails.
 
 ## Authentication & Access
 

@@ -4,16 +4,16 @@ This file contains context and architectural notes for the `personal-portfolio` 
 
 ## ✅ Deployment Status
 
-*   **Status:** Live & Operational (Feb 2026).
-*   **Infrastructure:** Google Compute Engine VM running Docker Compose.
-*   **CI/CD:** Fully automated via GitHub Actions (Build -> Push to GAR -> SSH Deploy).
+*   **Status:** Live & Operational.
+*   **Infrastructure:** Google Cloud Run (us-west1), one warm instance, custom domain via Cloud Run domain mapping (Google-managed TLS).
+*   **CI/CD:** GitHub Actions (Build -> Push to GAR -> `gcloud run deploy`), authenticated with Workload Identity Federation.
 
 ## Project Overview
 
 *   **Name:** `personal-portfolio`
 *   **Type:** Flask application embedding a Plotly Dash multipage app.
 *   **Goal:** A professional portfolio and technical demonstration platform showcasing capabilities in Data Engineering, BI, and AI/LLM integration.
-*   **Stack:** Python 3.13, Flask, Dash, Redis, Celery, Pandas.
+*   **Stack:** Python 3.13, Flask, Dash, Pandas.
 
 ## Key Architectural Patterns
 
@@ -37,8 +37,9 @@ This file contains context and architectural notes for the `personal-portfolio` 
     *   Dash callbacks are primarily registered here to keep page logic clean.
     *   It imports the UI classes from `pages/` to access component IDs.
 
-5.  **Background Tasks (Celery/Redis):**
-    *   Used for long-running AI tasks (e.g., image generation, complex RAG queries) to prevent blocking the UI.
+5.  **Long-running AI callbacks run inside the request:**
+    *   There is no task queue. Slow Gemini calls (~3.5 min observed for the sales deck) run as regular Dash callbacks with `running=` spinners.
+    *   Cloud Run's request timeout (600s, Terraform) and gunicorn's `--timeout` (app/Dockerfile) must stay at least as long as the slowest callback.
 
 ## Content & Features
 
@@ -54,16 +55,15 @@ This file contains context and architectural notes for the `personal-portfolio` 
 ## Common Tasks & Commands
 
 *   **Run Local:** `flask --app app run -p 8050`
-*   **Run Celery:** `celery -A app:celery_app worker ...`
 *   **Dependency Management:** Uses `uv` (e.g., `uv add openai`).
-*   **Deployment:** Dockerized deployment via Terraform to Google Cloud Run.
+*   **Deployment:** Push to `main` deploys the app; `./bootstrap.sh` plans/applies Terraform.
 
 ## Directory Map
 
 *   `app/`: Application source.
 *   `app/dash_app/assets/`: CSS, Images, and Data Files (`resume.json`).
 *   `app/dash_app/pages/`: Dashboard logic.
-*   `modules/`: Terraform infrastructure modules.
+*   `infrastructure/`: Terraform (Cloud Run, secrets, domain mapping, DNS, CI identity).
 
 ## External Data & APIs
 
@@ -75,10 +75,10 @@ This file contains context and architectural notes for the `personal-portfolio` 
 
 *   **Containerization:** Dockerfile defines the runtime environment.
 *   **IaC:** Terraform manages GCP resources:
-    *   **Compute Engine:** VM instance (`e2-small`) with `pd-balanced` disk.
-    *   **Networking:** Static IP, Firewall rules (HTTP/HTTPS/SSH).
-    *   **Storage:** Artifact Registry (Docker images), GCS (Terraform state).
-    *   **Security:** Secret Manager (GitHub PAT, App Secrets), Workload Identity Federation.
+    *   **Cloud Run:** service `personal-portfolio` (1 vCPU, 1 GiB, min 1 / max 3 instances) running as its own service account.
+    *   **Domain:** Cloud Run domain mapping + DNS-only Cloudflare CNAME to `ghs.googlehosted.com`.
+    *   **Storage:** Artifact Registry (Docker images), GCS bucket `ne-tf` prefix `default/state` (Terraform state; other projects' state shares the bucket).
+    *   **Security:** Secret Manager (Flask keys, dedicated Gemini API key), Workload Identity Federation pool `personal-portfolio-github`.
 *   **CI/CD:** GitHub Actions triggers builds on push to `main`.
 
 - **Sales Enablement / Slide Deck Generation:**

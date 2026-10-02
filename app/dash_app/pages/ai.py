@@ -23,7 +23,6 @@ from dash_app.utils import load_secret
 # Get environment variables
 load_dotenv(find_dotenv())
 PAGE = 'ai'
-REDIS_URL = os.environ['REDIS_URL']
 pd.set_option('future.no_silent_downcasting', True)
 
 logger = logging.getLogger(__name__)

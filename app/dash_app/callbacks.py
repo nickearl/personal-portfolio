@@ -22,8 +22,6 @@ from dash_app.pages.home import UInterface as home_ui
 from dash_app.pages.dashboard import UInterface as dashboard_ui
 from dash_app.pages.sales_enablement import UInterface as sales_ui
 
-REDIS_URL = os.environ['REDIS_URL']
-
 logger = logging.getLogger(__name__)
 
 AI_UI = None
@@ -31,8 +29,6 @@ HOME_UI = None
 DASHBOARD_UI = None
 
 def register_callbacks(app):
-	from app import BACKGROUND_CALLBACK_MANAGER
-
 	global AI_UI, DASHBOARD_UI, HOME_UI
 	if AI_UI is None: AI_UI = ai_ui()
 	if HOME_UI is None: HOME_UI = home_ui()
@@ -174,8 +170,6 @@ def register_callbacks(app):
 			(Output('ai-input-image-submit', 'children'), [dbc.Spinner(size='sm'),' Asking Gemini...'], [html.I(className='bi bi-robot'),' Submit']),
 		],
 		prevent_initial_call=True,
-		background=True,
-    	manager=BACKGROUND_CALLBACK_MANAGER,
 	)
 	def ai_generate_image(n_clicks,input_prompt):
 		logger.info('[' + str(datetime.now()) + '] | '+ '[ai_generate_image] | ' + str(dash.ctx.triggered_id))
@@ -203,8 +197,6 @@ def register_callbacks(app):
 			(Output('ai-input-colors-submit', 'children'), [dbc.Spinner(size='sm'),' Asking Gemini...'], [html.I(className='bi bi-robot'),' Submit']),
 		],
 		prevent_initial_call=True,
-		background=True,
-    	manager=BACKGROUND_CALLBACK_MANAGER,
 	)
 	def ai_custom_colors(n_clicks,input_prompt):
 		logger.info('[' + str(datetime.now()) + '] | '+ '[ai_custom_colors] | ' + str(dash.ctx.triggered_id))
@@ -242,8 +234,6 @@ def register_callbacks(app):
 		State('sales-input-style', 'value'),
 		State('sales-input-length', 'value'),
 		prevent_initial_call=True,
-		background=True,
-		manager=BACKGROUND_CALLBACK_MANAGER,
 	)
 	def sales_generate_deck(n_clicks, company, industry, audience, style, length):
 		logger.info(f'[{datetime.now()}] | [sales_generate_deck] | trig_id: [{dash.ctx.triggered_id}]')

@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy to Cloud Run
 
 on:
   push:
@@ -7,12 +7,9 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   REGION: ${{ vars.GCP_REGION }}
-  GAR_LOCATION: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO_NAME }}
-  IMAGE: ${{ vars.IMAGE_NAME }}
-  VM_NAME: ${{ vars.GCP_VM_NAME }}
-  ZONE: ${{ vars.GCP_VM_ZONE }}
+  IMAGE_URI: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO_NAME }}/${{ vars.IMAGE_NAME }}
+  SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
 
 jobs:
   deploy:
@@ -27,7 +24,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Google Auth
-        id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -37,31 +33,13 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Docker Auth
-        run: |-
-          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
 
       - name: Build and Push Container
         run: |-
-          docker build -t "$GAR_LOCATION/$IMAGE:latest" -f app/Dockerfile .
-          docker push "$GAR_LOCATION/$IMAGE:latest"
+          docker build -t "$IMAGE_URI:$GITHUB_SHA" -t "$IMAGE_URI:latest" -f app/Dockerfile .
+          docker push --all-tags "$IMAGE_URI"
 
-      - name: Get VM IP
-        id: get-ip
-        run: |
-          IP=$(gcloud compute instances describe $VM_NAME --zone=$ZONE --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
-          echo "vm_ip=$IP" >> $GITHUB_OUTPUT
-
-      - name: Deploy to VM
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ steps.get-ip.outputs.vm_ip }}
-          username: ${{ vars.SSH_USER }}
-          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-          script: |
-            export GITHUB_TOKEN=$(gcloud secrets versions access latest --secret="github-pat" 2>/dev/null || echo "")
-            gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
-            cd /opt/${{ vars.GCP_VM_NAME }}
-            docker compose pull
-            docker compose up -d
-            docker exec nginx nginx -s reload || true
-            docker image prune -a -f --filter "until=24h"
+      # Only the image changes here; all other service config is owned by Terraform
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy "$SERVICE" --image "$IMAGE_URI:$GITHUB_SHA" --region "$REGION" --quiet

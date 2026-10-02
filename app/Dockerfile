@@ -18,8 +18,6 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY app .
 ENV PORT=1701
 EXPOSE 1701
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -fsS http://localhost:1701/healthz || exit 1
 # Pre-install DuckDB extensions
 RUN uv run python - <<'PY'
 import duckdb
@@ -28,4 +26,6 @@ con.execute("INSTALL httpfs;")
 con.close()
 PY
 
-CMD ["uv", "run", "gunicorn", "app:server", "-b", "0.0.0.0:1701", "--workers", "2", "--threads", "4", "--timeout", "180"]
+# AI demo callbacks run inside the request (no task queue), so the timeout must cover the
+# slowest one: the sales deck makes up to 6 sequential Gemini calls (~3.5 min observed). Cloud Run's request timeout matches.
+CMD exec gunicorn app:server -b 0.0.0.0:${PORT} --workers 2 --threads 8 --timeout 600
