@@ -68,7 +68,7 @@ class UInterface:
 			"Weyland-Yutani", "Heavy Industry", "Technical Team", "Cyberpunk", "Short and funny"
 		)
 		self.example_deck = html.Div([
-			self.deck_grid([(None, self.slide_image(f'assets/images/weyland-yutani_{n}.webp')) for n in range(1, 6)]),
+			self.deck_grid([(None, self.slide_image(f'assets/images/weyland-yutani_{n}.webp', f'Weyland-Yutani example deck, slide {n}')) for n in range(1, 6)]),
 			self.default_plaque,
 		])
 
@@ -286,7 +286,8 @@ class UInterface:
 		deck_id = uuid.uuid4().hex[:12]
 		slides = []
 		for i, slide in enumerate(plan['slides']):
-			job = {'deck': deck_id, 'index': i, 'prompt': slide['image_prompt']}
+			# title only labels the rendered image (alt text / lightbox caption); the signature covers the prompt
+			job = {'deck': deck_id, 'index': i, 'prompt': slide['image_prompt'], 'title': slide.get('title') or f'Slide {i + 1}'}
 			job['sig'] = self._slide_signature(deck_id, i, slide['image_prompt'])
 			slides.append((slide.get('title'), html.Div([
 				html.Div(self.slide_placeholder(i), id={'type': 'sales-slide', 'deck': deck_id, 'index': i}),
@@ -302,10 +303,11 @@ class UInterface:
 				html.Div(title, className='small fw-bold text-secondary mb-1') if title else None,
 				body,
 			], xs=12, md=12 if i == 0 else 6, className='mb-3'))
-		return dbc.Row(cols)
+		return dbc.Row(cols, className='deck-grid')
 
-	def slide_image(self, src):
-		return html.Img(src=src, style={'width': '100%', 'aspect-ratio': '16 / 9', 'object-fit': 'contain', 'border-radius': '0.5rem', 'background-color': 'white'})
+	def slide_image(self, src, alt):
+		# .deck-slide opens in the lightbox (assets/lightbox.js); focusable so Enter/Space open it too
+		return html.Img(src=src, alt=alt, className='deck-slide', tabIndex='0', role='button', style={'width': '100%', 'aspect-ratio': '16 / 9', 'object-fit': 'contain', 'border-radius': '0.5rem', 'background-color': 'white'})
 
 	def slide_placeholder(self, index):
 		return self._slide_box([dbc.Spinner(size='sm', color='secondary'), html.Span(f'Rendering slide {index + 1}...', className='text-muted small')])
