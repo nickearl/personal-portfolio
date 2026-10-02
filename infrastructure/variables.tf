@@ -49,3 +49,8 @@ variable "github_repo" {
   description = "GitHub repository (owner/name) allowed to deploy"
   type        = string
 }
+
+variable "alert_email" {
+  description = "Address that receives site-down and certificate alerts"
+  type        = string
+}
